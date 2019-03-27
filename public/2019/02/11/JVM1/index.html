@@ -82,14 +82,14 @@
 <meta name="description" content="最近正在看张秀宏著的《自己动手写Java虚拟机》，这本书适合初学者更深入的理解java虚拟机的含义，也可以简单学习go语言的基本使用。 准备工作安装JDK从Oracle官网下载最新的JDK，双击运行即可。我使用的是1.8.0_161 安装GO从GO语言官网下载最新版本的GO安装文件，双击运行即可,我使用的是1.11.2。测试Go环境是否安装成功12～$ go versiongo version g">
 <meta name="keywords" content="JVM,JAVA,GO,学习笔记">
 <meta property="og:type" content="article">
-<meta property="og:title" content="自己动手写JAVA虚拟机学习笔记一【命令行工具】">
+<meta property="og:title" content="《自己动手写JAVA虚拟机》学习笔记一【命令行工具】">
 <meta property="og:url" content="https://a19140312.github.io/2019/02/11/JVM1/index.html">
 <meta property="og:site_name" content="qing&#39;s blog">
 <meta property="og:description" content="最近正在看张秀宏著的《自己动手写Java虚拟机》，这本书适合初学者更深入的理解java虚拟机的含义，也可以简单学习go语言的基本使用。 准备工作安装JDK从Oracle官网下载最新的JDK，双击运行即可。我使用的是1.8.0_161 安装GO从GO语言官网下载最新版本的GO安装文件，双击运行即可,我使用的是1.11.2。测试Go环境是否安装成功12～$ go versiongo version g">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-02-11T10:12:42.170Z">
+<meta property="og:updated_time" content="2019-02-14T06:24:46.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="自己动手写JAVA虚拟机学习笔记一【命令行工具】">
+<meta name="twitter:title" content="《自己动手写JAVA虚拟机》学习笔记一【命令行工具】">
 <meta name="twitter:description" content="最近正在看张秀宏著的《自己动手写Java虚拟机》，这本书适合初学者更深入的理解java虚拟机的含义，也可以简单学习go语言的基本使用。 准备工作安装JDK从Oracle官网下载最新的JDK，双击运行即可。我使用的是1.8.0_161 安装GO从GO语言官网下载最新版本的GO安装文件，双击运行即可,我使用的是1.11.2。测试Go环境是否安装成功12～$ go versiongo version g">
 
 
@@ -126,7 +126,7 @@
 
 
 
-  <title>自己动手写JAVA虚拟机学习笔记一【命令行工具】 | qing's blog</title>
+  <title>《自己动手写JAVA虚拟机》学习笔记一【命令行工具】 | qing's blog</title>
   
 
 
@@ -270,7 +270,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">自己动手写JAVA虚拟机学习笔记一【命令行工具】</h1>
+          <h1 class="post-title" itemprop="name headline">《自己动手写JAVA虚拟机》学习笔记一【命令行工具】</h1>
         
 
         <div class="post-meta">
@@ -384,6 +384,10 @@
 </tr>
 </tbody>
 </table>
+<h3 id="编写命令行工具"><a href="#编写命令行工具" class="headerlink" title="编写命令行工具"></a>编写命令行工具</h3><p>首先创建项目结构<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">|-jvmgo</span><br><span class="line">    |-ch01</span><br></pre></td></tr></table></figure></p>
+<p>在ch01目录下创建cmd.go文件<br><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> <span class="string">"flag"</span></span><br><span class="line"><span class="keyword">import</span> <span class="string">"fmt"</span></span><br><span class="line"><span class="keyword">import</span> <span class="string">"os"</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">//用法: java [-options] class [args...] (执行类)</span></span><br><span class="line"><span class="comment">//或  java [-options] -jar jarfile [args...] (执行 jar 文件)</span></span><br><span class="line"><span class="keyword">type</span> Cmd <span class="keyword">struct</span> &#123;</span><br><span class="line">	helpFlag <span class="keyword">bool</span></span><br><span class="line">	versionFlag <span class="keyword">bool</span></span><br><span class="line">	cpOption <span class="keyword">string</span></span><br><span class="line">	class <span class="keyword">string</span></span><br><span class="line">	args []<span class="keyword">string</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">//把命令的用法打印到控制台</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">printUsage</span><span class="params">()</span></span>  &#123;</span><br><span class="line">	fmt.Printf(<span class="string">"Usage：%s [-options] class [args...]\n"</span>,os.Args[<span class="number">0</span>])</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//命令解析</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">parseCmd</span><span class="params">()</span> *<span class="title">Cmd</span></span> &#123;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">//声明cmd为指向空的Cmd对象的指针</span></span><br><span class="line">	cmd := &amp;Cmd&#123;&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">//定义flag参数</span></span><br><span class="line">	<span class="comment">//Usage是一个函数，默认输出所有定义了的命令行参数和帮助信息</span></span><br><span class="line">	flag.Usage = printUsage</span><br><span class="line">	flag.BoolVar(&amp;cmd.helpFlag,<span class="string">"help"</span>,<span class="literal">false</span>,<span class="string">"print help message"</span>)</span><br><span class="line">	flag.BoolVar(&amp;cmd.helpFlag,<span class="string">"?"</span>,<span class="literal">false</span>,<span class="string">"print help message"</span>)</span><br><span class="line">	flag.BoolVar(&amp;cmd.versionFlag,<span class="string">"version"</span>,<span class="literal">false</span>,<span class="string">"print version and exit"</span>)</span><br><span class="line">	flag.StringVar(&amp;cmd.cpOption,<span class="string">"classpath"</span>,<span class="string">""</span>,<span class="string">"classpath"</span>)</span><br><span class="line">	flag.StringVar(&amp;cmd.cpOption,<span class="string">"cp"</span>,<span class="string">""</span>,<span class="string">"classpath"</span>)</span><br><span class="line">	<span class="comment">//在所有的flag定义完成之后，可以通过调用flag.Parse()进行解析。</span></span><br><span class="line">	flag.Parse()</span><br><span class="line">	<span class="comment">//flag.Args()可以捕获未被解析的参数</span></span><br><span class="line">	args := flag.Args()</span><br><span class="line">	<span class="keyword">if</span> <span class="built_in">len</span>(args) &gt; <span class="number">0</span>&#123;</span><br><span class="line">		cmd.class = args[<span class="number">0</span>]</span><br><span class="line">		cmd.args = args[<span class="number">1</span>:]</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> cmd</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="测试代码"><a href="#测试代码" class="headerlink" title="测试代码"></a>测试代码</h3><p>在ch01目录下创建main.go文件<br><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> <span class="string">"fmt"</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	cmd := parseCmd()</span><br><span class="line">	<span class="keyword">if</span> cmd.versionFlag &#123;</span><br><span class="line">		fmt.Println(<span class="string">"version 0.0.1"</span>)</span><br><span class="line">	&#125;<span class="keyword">else</span> <span class="keyword">if</span> cmd.helpFlag || cmd.class == <span class="string">""</span>&#123;</span><br><span class="line">		printUsage()</span><br><span class="line">	&#125;<span class="keyword">else</span> &#123;</span><br><span class="line">		startJVM(cmd)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//模拟启动jvm</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">startJVM</span><span class="params">(cmd *Cmd)</span></span>  &#123;</span><br><span class="line">	<span class="comment">//还未开始写，暂时打印</span></span><br><span class="line">	fmt.Printf(<span class="string">"classpath:%s class:%s args:%v\n"</span>,cmd.cpOption,cmd.class,cmd.args)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>编译main.go，并测试-version<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ go install jvmgo/ch01 </span><br><span class="line">$ ch01 -version</span><br><span class="line">version 0.0.1</span><br></pre></td></tr></table></figure></p>
 
       
     </div>
@@ -413,11 +417,11 @@
   <!-- JS库 sweetalert 可修改路径 -->
   <script src="https://cdn.bootcss.com/jquery/2.0.0/jquery.min.js"></script>
   <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
-  <p><span>本文标题:</span><a href="/2019/02/11/JVM1/">自己动手写JAVA虚拟机学习笔记一【命令行工具】</a></p>
+  <p><span>本文标题:</span><a href="/2019/02/11/JVM1/">《自己动手写JAVA虚拟机》学习笔记一【命令行工具】</a></p>
   <p><span>文章作者:</span><a href="/" title="访问 guyuqing 的个人博客">guyuqing</a></p>
   <p><span>发布时间:</span>2019年02月11日 - 17:23</p>
-  <p><span>最后更新:</span>2019年02月11日 - 18:12</p>
-  <p><span>原始链接:</span><a href="/2019/02/11/JVM1/" title="自己动手写JAVA虚拟机学习笔记一【命令行工具】">https://a19140312.github.io/2019/02/11/JVM1/</a>
+  <p><span>最后更新:</span>2019年02月14日 - 14:24</p>
+  <p><span>原始链接:</span><a href="/2019/02/11/JVM1/" title="《自己动手写JAVA虚拟机》学习笔记一【命令行工具】">https://a19140312.github.io/2019/02/11/JVM1/</a>
     <span class="copy-path" title="点击复制文章链接"><i class="fa fa-clipboard" data-clipboard-text="https://a19140312.github.io/2019/02/11/JVM1/" aria-label="复制成功！"></i></span>
   </p>
   <p><span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">署名-非商业性使用-禁止演绎 4.0 国际</a> 转载请保留原文链接及作者。</p>
@@ -507,8 +511,8 @@
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2019/03/13/Redis/" rel="prev" title="redis常见面试题">
-                redis常见面试题 <i class="fa fa-chevron-right"></i>
+              <a href="/2019/02/12/JVM2/" rel="prev" title="《自己动手写JAVA虚拟机》学习笔记二【搜索class文件】">
+                《自己动手写JAVA虚拟机》学习笔记二【搜索class文件】 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -584,7 +588,7 @@
               
                 <a href="/archives">
               
-                  <span class="site-state-item-count">3</span>
+                  <span class="site-state-item-count">6</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -606,7 +610,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">10</span>
+                  <span class="site-state-item-count">11</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
@@ -655,7 +659,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#准备工作"><span class="nav-number">1.</span> <span class="nav-text">准备工作</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#安装JDK"><span class="nav-number">1.1.</span> <span class="nav-text">安装JDK</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装GO"><span class="nav-number">1.2.</span> <span class="nav-text">安装GO</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实现JAVA命令"><span class="nav-number">2.</span> <span class="nav-text">实现JAVA命令</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#准备工作"><span class="nav-number">1.</span> <span class="nav-text">准备工作</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#安装JDK"><span class="nav-number">1.1.</span> <span class="nav-text">安装JDK</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装GO"><span class="nav-number">1.2.</span> <span class="nav-text">安装GO</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实现JAVA命令"><span class="nav-number">2.</span> <span class="nav-text">实现JAVA命令</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#编写命令行工具"><span class="nav-number">2.1.</span> <span class="nav-text">编写命令行工具</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#测试代码"><span class="nav-number">2.2.</span> <span class="nav-text">测试代码</span></a></li></ol></li></ol></div>
             
 
           </div>

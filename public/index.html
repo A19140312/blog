@@ -249,6 +249,147 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://a19140312.github.io/2019/03/27/Redis-sds/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="guyuqing">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="qing's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/03/27/Redis-sds/" itemprop="url">redis-sds动态字符串【学习笔记】</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-03-27T15:56:04+08:00">
+                2019-03-27
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
+                  <a href="/categories/redis/" itemprop="url" rel="index">
+                    <span itemprop="name">redis</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h3 id="SDS定义"><a href="#SDS定义" class="headerlink" title="SDS定义"></a>SDS定义</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * 保存字符串对象的结构</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">sdshdr</span> &#123;</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment">// buf 中已占用空间的长度</span></span><br><span class="line">    <span class="keyword">int</span> len;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// buf 中剩余可用空间的长度</span></span><br><span class="line">    <span class="keyword">int</span> <span class="built_in">free</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 数据空间</span></span><br><span class="line">    <span class="keyword">char</span> buf[];</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h3 id="SDS常用函数"><a href="#SDS常用函数" class="headerlink" title="SDS常用函数"></a>SDS常用函数</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * 返回 sds 实际保存的字符串的长度</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * T = O(1)</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">inline</span> size_t <span class="title">sdslen</span><span class="params">(<span class="keyword">const</span> sds s)</span> </span>&#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">sdshdr</span> *<span class="title">sh</span> = (<span class="title">void</span>*)(<span class="title">s</span>-(<span class="title">sizeof</span>(<span class="title">struct</span> <span class="title">sdshdr</span>)));</span></span><br><span class="line">    <span class="keyword">return</span> sh-&gt;len;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+          
+        
+      
+    </div>
+    
+    
+    
+    
+    
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://a19140312.github.io/2019/03/13/Redis/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
@@ -400,6 +541,313 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://a19140312.github.io/2019/02/14/JVM3/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="guyuqing">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="qing's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/02/14/JVM3/" itemprop="url">《自己动手写JAVA虚拟机》学习笔记三【解析class文件】</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-02-14T11:38:04+08:00">
+                2019-02-14
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
+                  <a href="/categories/JVM/" itemprop="url" rel="index">
+                    <span itemprop="name">JVM</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>java虚拟机规范中使用一种类似C语言结构体来描述Class文件的基本结构，具体如下：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">ClassFile &#123;</span><br><span class="line">     u4             magic;<span class="comment">//魔数</span></span><br><span class="line">     u2             minor_version;<span class="comment">//主版本号</span></span><br><span class="line">     u2             major_version;<span class="comment">//次版本号</span></span><br><span class="line">     u2             constant_pool_count;<span class="comment">//常量池长度</span></span><br><span class="line">     cp_info        constant_pool[constant_pool_count-<span class="number">1</span>];<span class="comment">//常量池信息</span></span><br><span class="line">     u2             access_flags;<span class="comment">//该类的访问修饰符</span></span><br><span class="line">     u2             this_class;<span class="comment">//类索引</span></span><br><span class="line">     u2             super_class;<span class="comment">//父类索引</span></span><br><span class="line">     u2             interfaces_count;<span class="comment">//接口个数</span></span><br><span class="line">     u2             interfaces[interfaces_count];<span class="comment">//接口详细信息</span></span><br><span class="line">     u2             fields_count;<span class="comment">//属性个数</span></span><br><span class="line">     field_info     fields[fields_count];<span class="comment">//属性详细信息</span></span><br><span class="line">     u2             methods_count;<span class="comment">//方法个数</span></span><br><span class="line">     method_info    methods[methods_count];<span class="comment">//方法详情</span></span><br><span class="line">     u2             attributes_count;<span class="comment">//类文件属性个数</span></span><br><span class="line">     attribute_info attributes[attributes_count];<span class="comment">//类文件属性详细信息</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="准备工作"><a href="#准备工作" class="headerlink" title="准备工作"></a>准备工作</h3><p>把ch02的目录结构复制一份改名ch03，在ch03的目录中创建一个classfile子目录。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">|-jvmgo</span><br><span class="line">    |-ch01</span><br><span class="line">    |-ch01</span><br><span class="line">    |-ch03</span><br><span class="line">        |-classfile</span><br><span class="line">        |-classpath</span><br><span class="line">        |-cmd.go</span><br><span class="line">        |-main.go</span><br></pre></td></tr></table></figure></p>
+<p>为了学习编译后的class文件，新建一个classFileTest.java然后编译<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ClassFileTest</span> </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">boolean</span> FLAG = <span class="keyword">true</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">byte</span> BYTE = <span class="number">123</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">char</span> X = <span class="string">'X'</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">short</span> SHORT = <span class="number">12345</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> INT = <span class="number">123456789</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">long</span> LONG = <span class="number">12345678901L</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">float</span> PI = <span class="number">3.14f</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">double</span> E = <span class="number">2.71828</span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> RuntimeException </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"Hello, World!"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>用作者提供的<a href="https://github.com/zxh0/classpy" target="_blank" rel="noopener">classpy</a>的图形化工具，可以查看反编译后的class文件。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+    
+    
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://a19140312.github.io/2019/02/12/JVM2/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="guyuqing">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="qing's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/02/12/JVM2/" itemprop="url">《自己动手写JAVA虚拟机》学习笔记二【搜索class文件】</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-02-12T16:14:04+08:00">
+                2019-02-12
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
+                  <a href="/categories/JVM/" itemprop="url" rel="index">
+                    <span itemprop="name">JVM</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">HelloWorld</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span></span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"Hello, world!"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>运行上面的java程序时，我们知道首先要启动java虚拟机，然后加载主类，最后调用主类的main方法。但是在加载HelloWorld类之前，首先要加载它的超类java.lang.Object，在调用main()函数之前，虚拟机要准备好参数数组，所以需要加载java.lang.String和java.lang.String[]类。把字符串打印到控制台还需要加载java.lang.System类，等等。。那么java虚拟机如何寻找这些类的呢？</p>
+<h2 id="类路径"><a href="#类路径" class="headerlink" title="类路径"></a>类路径</h2><p>类路径可以分为以下三种：</p>
+<ul>
+<li>启动类路径(bootstrap classpath)：启动类路径默认对应jre/lib目录，Java标准库位于该路径。</li>
+<li>扩展类路径(extention classpath)：扩展类路径默认对应jre/lib/ext目录，使用Java扩展机制的类位于该路径。</li>
+<li>用户类路径(user classpath)：我们自己实现的类，以及第三方类库则位于用户类路径。用户类路径的默认值是当前路径，也就是”.”，可以给java命令传递-classpath选项来指定。</li>
+</ul>
+<h3 id="准备工作"><a href="#准备工作" class="headerlink" title="准备工作"></a>准备工作</h3><p>把ch01的目录结构复制一份改名ch02，在ch02的目录中创建一个classpath子目录。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">|-jvmgo</span><br><span class="line">    |-ch01</span><br><span class="line">    |-ch01</span><br><span class="line">        |-classpath</span><br><span class="line">        |-cmd.go</span><br><span class="line">        |-main.go</span><br></pre></td></tr></table></figure></p>
+<p>修改cmd结构体，添加XjreOption字段<br><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Cmd <span class="keyword">struct</span> &#123;</span><br><span class="line">	helpFlag <span class="keyword">bool</span></span><br><span class="line">	versionFlag <span class="keyword">bool</span></span><br><span class="line">	cpOption <span class="keyword">string</span></span><br><span class="line">	XjreOption <span class="keyword">string</span></span><br><span class="line">	class <span class="keyword">string</span></span><br><span class="line">	args []<span class="keyword">string</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>parseCmd()函数也对应添加Xjre<br><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//命令解析</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">parseCmd</span><span class="params">()</span> *<span class="title">Cmd</span></span> &#123;</span><br><span class="line">    ...<span class="comment">//其他代码不变</span></span><br><span class="line">	flag.StringVar(&amp;cmd.cpOption,<span class="string">"cp"</span>,<span class="string">""</span>,<span class="string">"classpath"</span>)</span><br><span class="line">	flag.StringVar(&amp;cmd.XjreOption,<span class="string">"Xjre"</span>,<span class="string">""</span>,<span class="string">"path to jre"</span>)</span><br><span class="line">	<span class="comment">//解析命令行参数到定义的flag</span></span><br><span class="line">	flag.Parse()</span><br><span class="line">	...<span class="comment">//其他代码不变</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="实现类路径"><a href="#实现类路径" class="headerlink" title="实现类路径"></a>实现类路径</h3><p>采用组合模式来实现类路径，把类路径当成一个大的整体，由启动类路径、扩展类路径和用户类路径三个小路径构成，三个小路径又分别由更小的路径构成。</p>
+<p>首先定义一个Entry接口<br><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//获取系统分隔符，windows是;类UNIX系统是:号</span></span><br><span class="line"><span class="keyword">const</span> pathListSeparator = <span class="keyword">string</span>(os.PathListSeparator)</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> Entry <span class="keyword">interface</span> &#123;</span><br><span class="line">	<span class="comment">//寻找和加载class文件  参数：class文件相对路径，路径之间用/，文件名有.class后缀</span></span><br><span class="line">	<span class="comment">//例如读取java.lang.Object入参是java/lang/Object.class</span></span><br><span class="line">	readClass(classname <span class="keyword">string</span>) ([]<span class="keyword">byte</span>, Entry, error)</span><br><span class="line"></span><br><span class="line">	<span class="comment">//toString</span></span><br><span class="line">	String() <span class="keyword">string</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>Entry接口一共有四种实现，CompositeEntry，WildcardEntry，ZipEntry，DirEntry</p>
+<h4 id="DirEntry"><a href="#DirEntry" class="headerlink" title="DirEntry"></a>DirEntry</h4><p>DirEntry相对简单些，表示目录形式的类路径<br><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> classpath</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">"path/filepath"</span></span><br><span class="line">	<span class="string">"io/ioutil"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> DirEntry <span class="keyword">struct</span> &#123;</span><br><span class="line">	<span class="comment">//存放目录的绝对路径</span></span><br><span class="line">	absDir <span class="keyword">string</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//相当于构造函数</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">newDirEntry</span><span class="params">(path <span class="keyword">string</span>)</span> *<span class="title">DirEntry</span></span> &#123;</span><br><span class="line">	<span class="comment">//将参数转换成绝对路径</span></span><br><span class="line">	absDir, err := filepath.Abs(path)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="built_in">panic</span>(err)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> &amp;DirEntry&#123;absDir&#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//读取class文件</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(self *DirEntry)</span> <span class="title">readClass</span> <span class="params">(className <span class="keyword">string</span>)</span> <span class="params">([]<span class="keyword">byte</span>, Entry, error)</span></span> &#123;</span><br><span class="line">	<span class="comment">//把目录和class名拼成完成路径</span></span><br><span class="line">	fileName := filepath.Join(self.absDir,className)</span><br><span class="line">	<span class="comment">//读取class文件内容</span></span><br><span class="line">	data, err := ioutil.ReadFile(fileName)</span><br><span class="line">	<span class="keyword">return</span> data,self,err</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//直接返回目录</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(self *DirEntry)</span> <span class="title">String</span><span class="params">()</span> <span class="title">string</span></span>&#123;</span><br><span class="line">	<span class="keyword">return</span> self.absDir</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h4 id="ZipEntry"><a href="#ZipEntry" class="headerlink" title="ZipEntry"></a>ZipEntry</h4><p>ZipEntry表示ZIP或者JAR文件形式的类路径<br><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> classpath</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">"path/filepath"</span></span><br><span class="line">	<span class="string">"archive/zip"</span></span><br><span class="line">	<span class="string">"io/ioutil"</span></span><br><span class="line">	<span class="string">"errors"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> ZipEntry <span class="keyword">struct</span> &#123;</span><br><span class="line">	<span class="comment">//存放目录的绝对路径</span></span><br><span class="line">	absPath <span class="keyword">string</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//相当于构造函数</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">newZipEntry</span><span class="params">(path <span class="keyword">string</span>)</span> *<span class="title">ZipEntry</span></span> &#123;</span><br><span class="line">	<span class="comment">//将参数转换成绝对路径</span></span><br><span class="line">	absPath, err := filepath.Abs(path)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="built_in">panic</span>(err)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> &amp;ZipEntry&#123;absPath&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//读取class文件</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(self *ZipEntry)</span> <span class="title">readClass</span><span class="params">(classname <span class="keyword">string</span>)</span> <span class="params">([]<span class="keyword">byte</span>, Entry, error)</span></span> &#123;</span><br><span class="line">	<span class="comment">//打开zip文件</span></span><br><span class="line">	r, err := zip.OpenReader(self.absPath)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span>,<span class="literal">nil</span>,err</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">defer</span> r.Close()</span><br><span class="line"></span><br><span class="line">	<span class="comment">//遍历zip包里的文件</span></span><br><span class="line">	<span class="keyword">for</span> _, f := <span class="keyword">range</span> r.File &#123;</span><br><span class="line">		<span class="comment">//找到class文件</span></span><br><span class="line">		<span class="keyword">if</span> f.Name == classname &#123;</span><br><span class="line">			<span class="comment">//打开class文件</span></span><br><span class="line">			rc , err := f.Open()</span><br><span class="line">			<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">				<span class="keyword">return</span> <span class="literal">nil</span>,<span class="literal">nil</span>,err</span><br><span class="line">			&#125;</span><br><span class="line">			<span class="keyword">defer</span> rc.Close()</span><br><span class="line">			<span class="comment">//读取class文件内容</span></span><br><span class="line">			data, err := ioutil.ReadAll(rc)</span><br><span class="line">			<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">				<span class="keyword">return</span> <span class="literal">nil</span>,<span class="literal">nil</span>,err</span><br><span class="line">			&#125;</span><br><span class="line">			<span class="keyword">return</span> data,self,err</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">//未找到class文件</span></span><br><span class="line">	<span class="keyword">return</span> <span class="literal">nil</span>,<span class="literal">nil</span>,errors.New(<span class="string">"class not found :"</span> +classname)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//直接返回目录</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(self *ZipEntry)</span> <span class="title">String</span><span class="params">()</span> <span class="title">string</span></span> &#123;</span><br><span class="line">	<span class="keyword">return</span> self.absPath</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h4 id="CompositeEntry"><a href="#CompositeEntry" class="headerlink" title="CompositeEntry"></a>CompositeEntry</h4><p>CompositeEntry表示有分隔符的类路径，CompositeEntry由更小的Entry组成，可以表示成[]Entry，go语言中则使用便利的slice</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> classpath</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">"strings"</span></span><br><span class="line">	<span class="string">"errors"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> CompositeEntry []Entry</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">//将每个小路径转换成具体的Entry</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">newCompositeEntry</span><span class="params">(pathList <span class="keyword">string</span>)</span> <span class="title">CompositeEntry</span></span> &#123;</span><br><span class="line">	<span class="keyword">var</span> compositeEntry []Entry</span><br><span class="line">	<span class="comment">//将路径按照分隔符进行分割</span></span><br><span class="line">	<span class="keyword">for</span> _, path := <span class="keyword">range</span> strings.Split(pathList,pathListSeparator)&#123;</span><br><span class="line">		entry := newEntry(path)</span><br><span class="line">		compositeEntry = <span class="built_in">append</span>(compositeEntry,entry)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> compositeEntry</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(self CompositeEntry)</span> <span class="title">readClass</span><span class="params">(classname <span class="keyword">string</span>)</span> <span class="params">([]<span class="keyword">byte</span>, Entry, error)</span></span> &#123;</span><br><span class="line">	<span class="comment">//遍历entry数据</span></span><br><span class="line">	<span class="keyword">for</span> _, entry := <span class="keyword">range</span> self&#123;</span><br><span class="line">		<span class="comment">//读取class文件，依次调用每一个子路径的readClass方法</span></span><br><span class="line">		data, from, err := entry.readClass(classname)</span><br><span class="line">		<span class="keyword">if</span> err == <span class="literal">nil</span>&#123;</span><br><span class="line">			<span class="keyword">return</span> data,from,err</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> <span class="literal">nil</span>,<span class="literal">nil</span>,errors.New(<span class="string">"class not found :"</span> +classname)</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//调用每个子路径的String方法，用分隔符拼接起来</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(self CompositeEntry)</span> <span class="title">String</span><span class="params">()</span> <span class="title">string</span></span> &#123;</span><br><span class="line">	strs := <span class="built_in">make</span>([]<span class="keyword">string</span>,<span class="built_in">len</span>(self))</span><br><span class="line">	<span class="keyword">for</span> i, entry := <span class="keyword">range</span> self&#123;</span><br><span class="line">		strs[i] = entry.String()</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> strings.Join(strs,pathListSeparator)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="WildcardEntry"><a href="#WildcardEntry" class="headerlink" title="WildcardEntry"></a>WildcardEntry</h4><p>WildcardEntry表示以*结尾的类路径，实际上也是CompositeEntry，因此就不再新定义类型类<br><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> classpath</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">"strings"</span></span><br><span class="line">	<span class="string">"os"</span></span><br><span class="line">	<span class="string">"path/filepath"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">newWildcardEntry</span><span class="params">(path <span class="keyword">string</span>)</span> <span class="title">CompositeEntry</span></span> &#123;</span><br><span class="line">	<span class="comment">//去掉尾部的*</span></span><br><span class="line">	baseDir := path[:<span class="built_in">len</span>(path)<span class="number">-1</span>]</span><br><span class="line">	<span class="keyword">var</span> compositeEntry []Entry</span><br><span class="line">	walkFn := <span class="function"><span class="keyword">func</span><span class="params">(path <span class="keyword">string</span>, info os.FileInfo, err error)</span> <span class="title">error</span></span>&#123;</span><br><span class="line">		<span class="keyword">if</span> err != <span class="literal">nil</span>&#123;</span><br><span class="line">			<span class="keyword">return</span> err</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="comment">//如果不是目录，返回跳过标识</span></span><br><span class="line">		<span class="keyword">if</span> info.IsDir() &amp;&amp; path != baseDir &#123;</span><br><span class="line">			<span class="keyword">return</span> filepath.SkipDir</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="comment">//选出jar文件</span></span><br><span class="line">		<span class="keyword">if</span> strings.HasSuffix(path,<span class="string">".jar"</span>) || strings.HasSuffix(path,<span class="string">".JAR"</span>)&#123;</span><br><span class="line">			jarEntry := newZipEntry(path)</span><br><span class="line">			compositeEntry = <span class="built_in">append</span>(compositeEntry,jarEntry)</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">//遍历baseDir路径，创建zipEntry</span></span><br><span class="line">	filepath.Walk(baseDir,walkFn)</span><br><span class="line">	<span class="comment">//fmt.Printf("compositeEntry : %s\n",compositeEntry)</span></span><br><span class="line">	<span class="keyword">return</span> compositeEntry</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h4 id="Entry"><a href="#Entry" class="headerlink" title="Entry"></a>Entry</h4><p>四种类路径都实现完之后，再来完善下Entry接口，添加Entry实例的构造方法。<br><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">newEntry</span><span class="params">(path <span class="keyword">string</span>)</span> <span class="title">Entry</span></span> &#123;</span><br><span class="line">	<span class="comment">//如果路径中含有分隔符</span></span><br><span class="line">	<span class="keyword">if</span> strings.Contains(path,pathListSeparator)&#123;</span><br><span class="line">		<span class="keyword">return</span> newCompositeEntry(path)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">//如果路径末尾是*</span></span><br><span class="line">	<span class="keyword">if</span> strings.HasSuffix(path,<span class="string">"*"</span>)&#123;</span><br><span class="line">		<span class="keyword">return</span> newWildcardEntry(path)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">//如果路径以jar或者zip结尾</span></span><br><span class="line">	<span class="keyword">if</span> strings.HasSuffix(path,<span class="string">".jar"</span>) || strings.HasSuffix(path,<span class="string">".JAR"</span>)||</span><br><span class="line">		strings.HasSuffix(path,<span class="string">".zip"</span>) || strings.HasSuffix(path,<span class="string">".ZIP"</span>)&#123;</span><br><span class="line">			<span class="keyword">return</span> newZipEntry(path)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> newDirEntry(path)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h4 id="实现Classpath"><a href="#实现Classpath" class="headerlink" title="实现Classpath"></a>实现Classpath</h4><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> classpath</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">"path/filepath"</span></span><br><span class="line">	<span class="string">"os"</span></span><br><span class="line">	<span class="string">"fmt"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> Classpath <span class="keyword">struct</span> &#123;</span><br><span class="line">	bootClasspath Entry</span><br><span class="line">	extClasspath Entry</span><br><span class="line">	userClasspath Entry</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//使用-Xjre选项解析启动类路径和扩展类路径，使用-classpath/-cp选项解析用户类路径</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Parse</span><span class="params">(jreOption,cpOption <span class="keyword">string</span>)</span> *<span class="title">Classpath</span></span>  &#123;</span><br><span class="line">	cp := &amp;Classpath&#123;&#125;</span><br><span class="line">	<span class="comment">//解析启动类路径和扩展类路径</span></span><br><span class="line">	cp.parseBootAndExtClasspath(jreOption)</span><br><span class="line"></span><br><span class="line">	<span class="comment">//解析用户类路径</span></span><br><span class="line">	cp.parseUserClasspath(cpOption)</span><br><span class="line">	<span class="keyword">return</span> cp</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">getJreDir</span><span class="params">(jreOption <span class="keyword">string</span>)</span> <span class="title">string</span></span> &#123;</span><br><span class="line">	<span class="comment">//优先使用用户输入的-Xjre作为目录</span></span><br><span class="line">	<span class="keyword">if</span> jreOption != <span class="string">""</span> &amp;&amp; exists(jreOption)&#123;</span><br><span class="line">		<span class="keyword">return</span> jreOption</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">//在当前目录下寻找jre目录</span></span><br><span class="line">	<span class="keyword">if</span> exists(<span class="string">"./jre"</span>) &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="string">"./jre"</span></span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">//尝试使用JAVA_HOME环境变量</span></span><br><span class="line">	<span class="keyword">if</span> jh := os.Getenv(<span class="string">"JAVA_HOME"</span>); jh != <span class="string">""</span>&#123;</span><br><span class="line">		<span class="keyword">return</span> filepath.Join(jh,<span class="string">"jre"</span>)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">panic</span>(<span class="string">"Can not find jre folder"</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//判断目录是否存在</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">exists</span><span class="params">(path <span class="keyword">string</span>)</span> <span class="title">bool</span></span> &#123;</span><br><span class="line">	<span class="keyword">if</span> _, err := os.Stat(path); err != <span class="literal">nil</span>&#123;</span><br><span class="line">		<span class="keyword">if</span> os.IsNotExist(err)&#123;</span><br><span class="line">			<span class="keyword">return</span> <span class="literal">false</span></span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> <span class="literal">true</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(self *Classpath)</span> <span class="title">parseBootAndExtClasspath</span><span class="params">(jreOption <span class="keyword">string</span>)</span></span> &#123;</span><br><span class="line">	<span class="comment">// 获取jre目录</span></span><br><span class="line">	jreDir := getJreDir(jreOption)</span><br><span class="line">	<span class="comment">//jre/lib/*</span></span><br><span class="line">	jreLibPath := filepath.Join(jreDir,<span class="string">"lib"</span>,<span class="string">"*"</span>)</span><br><span class="line">	self.bootClasspath = newWildcardEntry(jreLibPath)</span><br><span class="line">	<span class="comment">//jre/lib/ext/*</span></span><br><span class="line">	jreExtPath := filepath.Join(jreDir,<span class="string">"lib"</span>,<span class="string">"ext"</span>,<span class="string">"*"</span>)</span><br><span class="line">	self.extClasspath = newWildcardEntry(jreExtPath)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//解析用户类路径</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(self *Classpath)</span> <span class="title">parseUserClasspath</span><span class="params">(cpOption <span class="keyword">string</span>)</span></span> &#123;</span><br><span class="line">	<span class="comment">// 如果用户没有提供-classpath/-cp选项，则使用当前目录作为用户类路径</span></span><br><span class="line">	<span class="keyword">if</span> cpOption == <span class="string">""</span>&#123;</span><br><span class="line">		cpOption = <span class="string">"."</span></span><br><span class="line">	&#125;</span><br><span class="line">	self.userClasspath = newEntry(cpOption)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//寻找class方法</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(self *Classpath)</span> <span class="title">ReadClass</span><span class="params">(classname <span class="keyword">string</span>)</span> <span class="params">([]<span class="keyword">byte</span>, Entry, error)</span></span> &#123;</span><br><span class="line">	<span class="comment">//访问ReadClass方法只需传递类名，不用包含".class"后缀</span></span><br><span class="line">	classname = classname + <span class="string">".class"</span></span><br><span class="line">	<span class="comment">// 从bootClasspath寻找class文件</span></span><br><span class="line">	<span class="keyword">if</span> data, entry, err := self.bootClasspath.readClass(classname); err == <span class="literal">nil</span>&#123;</span><br><span class="line">		<span class="keyword">return</span> data, entry, err</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// 从extClasspath寻找class文件</span></span><br><span class="line">	<span class="keyword">if</span> data, entry, err := self.extClasspath.readClass(classname); err == <span class="literal">nil</span>&#123;</span><br><span class="line">		<span class="keyword">return</span> data, entry, err</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// 从userClasspath寻找class文件</span></span><br><span class="line">	<span class="keyword">return</span> self.userClasspath.readClass(classname)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(self *Classpath)</span> <span class="title">String</span><span class="params">()</span> <span class="title">string</span></span> &#123;</span><br><span class="line">	<span class="keyword">return</span> self.userClasspath.String()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="测试代码"><a href="#测试代码" class="headerlink" title="测试代码"></a>测试代码</h3><p>完善main.go中的startJVM<br><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//模拟启动jvm</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">startJVM</span><span class="params">(cmd *Cmd)</span></span>  &#123;</span><br><span class="line">	<span class="comment">// 获取Classpath</span></span><br><span class="line">	cp := classpath.Parse(cmd.XjreOption,cmd.cpOption)</span><br><span class="line">	fmt.Printf(<span class="string">"classpath:%s class:%s args:%v\n"</span>,cp,cmd.class,cmd.args)</span><br><span class="line">	<span class="comment">// 将.替换成/(java.lang.String -&gt; java/lang/String)</span></span><br><span class="line">	className := strings.Replace(cmd.class,<span class="string">"."</span>,<span class="string">"/"</span>,<span class="number">-1</span>)</span><br><span class="line">	<span class="comment">// 读取class</span></span><br><span class="line">	classData, _, err := cp.ReadClass(className)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		fmt.Printf(<span class="string">"Could not find or load main class %s\n"</span>,cmd.class)</span><br><span class="line">		<span class="keyword">return</span></span><br><span class="line">	&#125;</span><br><span class="line">	fmt.Printf(<span class="string">"class data : %v\n"</span>,classData)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>编译main.go，并测试-version<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ go install jvmgo/ch02 </span><br><span class="line">$ ch02 java.lang.String</span><br><span class="line"><span class="comment"># 没有传递-Xjre，会去读取$JAVA_HOME，成功打印出String.class的内容</span></span><br><span class="line">$ ch02 -Xjre /opt  java.lang.Object </span><br><span class="line"><span class="comment"># 传递错误-Xjre会打印出Could not find or load main class java.lang.Object</span></span><br></pre></td></tr></table></figure></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+    
+    
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://a19140312.github.io/2019/02/11/JVM1/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
@@ -419,7 +867,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2019/02/11/JVM1/" itemprop="url">自己动手写JAVA虚拟机学习笔记一【命令行工具】</a></h1>
+                <a class="post-title-link" href="/2019/02/11/JVM1/" itemprop="url">《自己动手写JAVA虚拟机》学习笔记一【命令行工具】</a></h1>
         
 
         <div class="post-meta">
@@ -535,218 +983,10 @@
 </tr>
 </tbody>
 </table>
-
-          
-        
-      
-    </div>
-    
-    
-    
-    
-    
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://a19140312.github.io/2019/01/30/Github-Pages-Blog/">
-
-    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="guyuqing">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.png">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="qing's blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2019/01/30/Github-Pages-Blog/" itemprop="url">Mac下利用Github Pages快速搭建免费博客</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-01-30T19:30:04+08:00">
-                2019-01-30
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category">
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
-                  <a href="/categories/blog/" itemprop="url" rel="index">
-                    <span itemprop="name">blog</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2019/01/30/Github-Pages-Blog/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count valine-comment-count" data-xid="/2019/01/30/Github-Pages-Blog/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>本博客利用Hexo + Next + GitHubPages 搭建博客。</p>
-<h2 id="准备工作"><a href="#准备工作" class="headerlink" title="准备工作"></a>准备工作</h2><h3 id="安装node-js"><a href="#安装node-js" class="headerlink" title="安装node.js"></a>安装node.js</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ brew install node</span><br></pre></td></tr></table></figure>
-<h3 id="安装-git"><a href="#安装-git" class="headerlink" title="安装 git"></a>安装 git</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ brew install git</span><br></pre></td></tr></table></figure>
-<h3 id="安装yarn"><a href="#安装yarn" class="headerlink" title="安装yarn"></a>安装yarn</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ npm install yarn</span><br></pre></td></tr></table></figure>
-<p>如果安装失败用</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ brew install yarn</span><br></pre></td></tr></table></figure>
-<h3 id="安装hexo"><a href="#安装hexo" class="headerlink" title="安装hexo"></a>安装hexo</h3><p>进入你的项目目录，举个例子我的目录是blog</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ <span class="built_in">cd</span> blog</span><br></pre></td></tr></table></figure>
-<p>然后用 yarn 安装 hexo</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ yarn add hexo -S</span><br></pre></td></tr></table></figure>
-<p>如果安装失败用</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ npm install hexo-cli -g</span><br><span class="line">$ npm install hexo-server --save</span><br></pre></td></tr></table></figure>
-<p>详细可见<a href="https://hexo.io/zh-cn/docs/" target="_blank" rel="noopener">官方文档</a></p>
-<h2 id="搭建本地博客"><a href="#搭建本地博客" class="headerlink" title="搭建本地博客"></a>搭建本地博客</h2><h3 id="项目初始化"><a href="#项目初始化" class="headerlink" title="项目初始化"></a>项目初始化</h3><p>进入你的项目目录,初始化hexo</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ <span class="built_in">cd</span> blog</span><br><span class="line">$ hexo init</span><br></pre></td></tr></table></figure>
-<h3 id="安装依赖"><a href="#安装依赖" class="headerlink" title="安装依赖"></a>安装依赖</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ yarn install</span><br></pre></td></tr></table></figure>
-<h3 id="启动本地服务"><a href="#启动本地服务" class="headerlink" title="启动本地服务"></a>启动本地服务</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-<p>在浏览器输入 <code>localhost:4000</code> 即可</p>
-<h2 id="关联-GitHub"><a href="#关联-GitHub" class="headerlink" title="关联 GitHub"></a>关联 GitHub</h2><h3 id="创建项目"><a href="#创建项目" class="headerlink" title="创建项目"></a>创建项目</h3><p><img src="/2019/01/30/Github-Pages-Blog/create-project.png" alt="创建项目"></p>
-<p>项目名称一定一定是 <code>[用户名].github.io</code><br><img src="/2019/01/30/Github-Pages-Blog/create-repository.png" alt="创建项目"></p>
-<h3 id="设置"><a href="#设置" class="headerlink" title="设置"></a>设置</h3><p><img src="/2019/01/30/Github-Pages-Blog/setting.png" alt="设置"></p>
-<p>在设置中找到GitHub Pages ，分支选择master，点击choose a theme</p>
-<p><img src="/2019/01/30/Github-Pages-Blog/github-pages.png" alt="设置github-pages"></p>
-<p>选择喜欢的主题，点击select theme即可<br><img src="/2019/01/30/Github-Pages-Blog/select-theme.png" alt="选择主题"></p>
-<p>到这里就可以访问你的主页啦  <code>https://[用户名].github.io/</code>,接下来复制你的项目链接</p>
-<p><img src="/2019/01/30/Github-Pages-Blog/copy-url.png" alt="复制项目链接"></p>
-<p>到你的本地项目根目录找到 <code>_config.yml</code> 文件，粘贴到以下位置</p>
-<p><img src="/2019/01/30/Github-Pages-Blog/deploy-position.png" alt="hexo设置git"></p>
-<h3 id="站点配置"><a href="#站点配置" class="headerlink" title="站点配置"></a>站点配置</h3><p>站点配置包括修改博客名称，描述，作者等等，建议直接查看<a href="https://hexo.io/zh-cn/docs/configuration" target="_blank" rel="noopener">官方教程</a></p>
-<h3 id="关联"><a href="#关联" class="headerlink" title="关联"></a>关联</h3><p>安装 hexo-deployer-git 插件<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ yarn add hexo-deployer-git -S</span><br></pre></td></tr></table></figure></p>
-<p>如果失败的话尝试下面的方法<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ npm install --save hexo-deployer-git</span><br></pre></td></tr></table></figure></p>
-<p>在你的项目文件夹下运行 hexo d -g （生成本地文件并将本地文件推送到 GitHub ，和 git push 功能相同）,如果失败的话前面加sudo<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$  hexo d -g</span><br></pre></td></tr></table></figure></p>
-<p>这时访问你的github主页<code>https://[用户名].github.io/</code>就可以啦</p>
-<h2 id="NexT主题配置"><a href="#NexT主题配置" class="headerlink" title="NexT主题配置"></a>NexT主题配置</h2><p>NexT 是一个高质量并且优雅的Hexo 主题。<br>详细可见<a href="https://github.com/iissnan/hexo-theme-next/blob/master/README.cn.md" target="_blank" rel="noopener">官方文档</a></p>
-<h3 id="安装NexT主题"><a href="#安装NexT主题" class="headerlink" title="安装NexT主题"></a>安装NexT主题</h3><p>在你的项目文件夹下，执行以下命令，安装NexT主题<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ git <span class="built_in">clone</span> https://github.com/iissnan/hexo-theme-next.git themes/next</span><br></pre></td></tr></table></figure></p>
-<p>更改项目根目录下<code>_config.yml</code> 文件，如下<br><img src="/2019/01/30/Github-Pages-Blog/change-theme.png" alt="更改主题"></p>
-<p>重新生成本地文件并推送到github<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$  hexo d -g</span><br></pre></td></tr></table></figure></p>
-<p>访问你的github主页<code>https://[用户名].github.io/</code>就可以看到啦</p>
-<h3 id="主题配置"><a href="#主题配置" class="headerlink" title="主题配置"></a>主题配置</h3><p><code>themes/next</code>文件夹下的<code>_config.yml</code>是主题的配置文件<br>next内置了4种主题方案，选择你喜欢的方案解开注释即可<br><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># ---------------------------------------------------------------</span></span><br><span class="line"><span class="comment"># Scheme Settings</span></span><br><span class="line"><span class="comment"># ---------------------------------------------------------------</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Schemes</span></span><br><span class="line"><span class="comment">#scheme: Muse</span></span><br><span class="line"><span class="attr">scheme:</span> <span class="string">Mist</span></span><br><span class="line"><span class="comment">#scheme: Pisces</span></span><br><span class="line"><span class="comment">#scheme: Gemini</span></span><br></pre></td></tr></table></figure></p>
-<p>Menu Settings是控制图中菜单的位置，根据需要解开注释即可<br><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># ---------------------------------------------------------------</span></span><br><span class="line"><span class="comment"># Menu Settings</span></span><br><span class="line"><span class="comment"># ---------------------------------------------------------------</span></span><br><span class="line"><span class="attr">menu:</span></span><br><span class="line"><span class="attr">  home:</span> <span class="string">/</span> <span class="string">||</span> <span class="string">home</span></span><br><span class="line"><span class="comment">#  about: /about/ || user</span></span><br><span class="line"><span class="attr">  tags:</span> <span class="string">/tags/</span> <span class="string">||</span> <span class="string">tags</span></span><br><span class="line"><span class="attr">  categories:</span> <span class="string">/categories/</span> <span class="string">||</span> <span class="string">th</span></span><br><span class="line"><span class="comment">#  archives: /archives/ || archive</span></span><br><span class="line"><span class="comment">#  schedule: /schedule/ || calendar</span></span><br><span class="line"><span class="comment">#  sitemap: /sitemap.xml || sitemap</span></span><br><span class="line"><span class="comment">#  commonweal: /404.html || heartbeat</span></span><br></pre></td></tr></table></figure></p>
-<p><img src="/2019/01/30/Github-Pages-Blog/blog-icon.png" alt="更改菜单"><br>还有很多很多的配置请参考<a href="http://theme-next.iissnan.com/getting-started.html#install-next-theme" target="_blank" rel="noopener">官方教程</a>,<a href="http://shenzekun.cn/hexo%E7%9A%84next%E4%B8%BB%E9%A2%98%E4%B8%AA%E6%80%A7%E5%8C%96%E9%85%8D%E7%BD%AE%E6%95%99%E7%A8%8B.html" target="_blank" rel="noopener">主题个性配置教程</a>,<a href="http://yearito.cn/posts/hexo-theme-beautify.html" target="_blank" rel="noopener">主题美化</a></p>
-<p>修改之后，运行以下命令就可以再你的主页看到啦<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$  hexo clean</span><br><span class="line">$  hexo d -g</span><br></pre></td></tr></table></figure></p>
-<p>也可以在本地启动服务器，在浏览器输入 <code>localhost:4000</code> 观看效果<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure></p>
-<h2 id="创建文章"><a href="#创建文章" class="headerlink" title="创建文章"></a>创建文章</h2><h3 id="添加【标签】页面"><a href="#添加【标签】页面" class="headerlink" title="添加【标签】页面"></a>添加【标签】页面</h3><p>新建标签页面<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new page tags</span><br></pre></td></tr></table></figure></p>
-<p>修改项目根目录下 source/tags 的 index.md 文件如下：<br><figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">title: tags</span><br><span class="line">type: "tags"</span><br><span class="line">comments: false</span><br><span class="line">---</span><br></pre></td></tr></table></figure></p>
-<p>修改<code>themes/next</code>文件夹下的<code>_config.yml</code>主题配置文件，取消  <code>tags: /tags/ || tags</code> 这行注释<br>新建测试文章<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">'test'</span></span><br></pre></td></tr></table></figure></p>
-<p>在测试文章的头部添加tags信息，如下：<br><figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">title: 测试文章</span><br><span class="line">tags:</span><br><span class="line">  - Testing</span><br><span class="line">  - Another Tag</span><br><span class="line">---</span><br></pre></td></tr></table></figure></p>
-<p>启动本地服务，就可以看到标签菜单，点击可进入标签页，看到 如图所示 证明标签页面添加成功。<br><img src="/2019/01/30/Github-Pages-Blog/tags.png" alt="标签"></p>
-<h3 id="添加【分类】页面"><a href="#添加【分类】页面" class="headerlink" title="添加【分类】页面"></a>添加【分类】页面</h3><p>新建标签页面<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new page categories</span><br></pre></td></tr></table></figure></p>
-<p>修改项目根目录下 source/tags 的 index.md 文件如下：<br><figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">title: categories</span><br><span class="line">type: "categories"</span><br><span class="line">comments: false</span><br><span class="line">---</span><br></pre></td></tr></table></figure></p>
-<p>修改<code>themes/next</code>文件夹下的<code>_config.yml</code>主题配置文件，取消  <code>categories: /categories/ || th</code> 这行注释<br>在测试文章的头部添加categories信息，如下：<br><figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">title: 测试文章</span><br><span class="line">tags:</span><br><span class="line">  - Testing</span><br><span class="line">  - Another Tag</span><br><span class="line">---</span><br><span class="line">categories: Testing</span><br></pre></td></tr></table></figure></p>
-<p>启动本地服务，就可以看到标签菜单，点击可进入标签页，看到 如图所示 证明分类页面添加成功。<br><img src="/2019/01/30/Github-Pages-Blog/categories.png" alt="分类"></p>
-<h3 id="给博客添加图片"><a href="#给博客添加图片" class="headerlink" title="给博客添加图片"></a>给博客添加图片</h3><p>在项目目录下执行</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ npm install hexo-asset-image --save</span><br></pre></td></tr></table></figure>
-<p>在用下面命令生成md文章时，会在_post目录下看到一个与文章同名的文件夹<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">'文章名'</span></span><br></pre></td></tr></table></figure></p>
-<p>将想要上传的图片先放到文件夹下，然后在博客中使用markdown的格式引入图片：<br><figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">![<span class="string">文字</span>](<span class="link">xxxx/图片名.jpg</span>)</span><br></pre></td></tr></table></figure></p>
-<p>文章名和文件夹名字相同，所以不需要绝对路径，只要xxxx是文件夹的名字就可以了。</p>
-<h3 id="添加Valine评论系统"><a href="#添加Valine评论系统" class="headerlink" title="添加Valine评论系统"></a>添加Valine评论系统</h3><p>首先需要去注册一个<a href="https://leancloud.cn/" target="_blank" rel="noopener">Leancloud</a>账号,验证邮箱<br>然后随便创建一个应用，按如图所示找到<code>appid</code>，<code>appkey</code><br><img src="/2019/01/30/Github-Pages-Blog/valine.png" alt="评论"></p>
-<p>按下图修改<code>themes/next</code>文件夹下的<code>_config.yml</code>主题配置文件，重新启动服务器就可以啦<br><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Valine.</span></span><br><span class="line"><span class="comment"># You can get your appid and appkey from https://leancloud.cn</span></span><br><span class="line"><span class="comment"># more info please open https://valine.js.org</span></span><br><span class="line"><span class="attr">valine:</span></span><br><span class="line"><span class="attr">  enable:</span> <span class="literal">true</span></span><br><span class="line"><span class="attr">  appid:</span> <span class="string">your</span> <span class="string">appid</span>  <span class="comment"># your leancloud application appid</span></span><br><span class="line"><span class="attr">  appkey:</span> <span class="string">your</span> <span class="string">appkey</span> <span class="comment"># your leancloud application appkey</span></span><br><span class="line"><span class="attr">  notify:</span> <span class="literal">false</span> <span class="comment"># mail notifier , https://github.com/xCss/Valine/wiki</span></span><br><span class="line"><span class="attr">  verify:</span> <span class="literal">false</span> <span class="comment"># Verification code</span></span><br><span class="line"><span class="attr">  placeholder:</span> <span class="string">描述</span>  <span class="comment"># comment box placeholder</span></span><br><span class="line"><span class="attr">  avatar:</span> <span class="string">monsterid</span> <span class="comment"># gravatar style</span></span><br><span class="line"><span class="attr">  guest_info:</span> <span class="string">nick,mail</span> <span class="comment"># custom comment header</span></span><br><span class="line"><span class="attr">  pageSize:</span> <span class="number">10</span> <span class="comment"># pagination size</span></span><br></pre></td></tr></table></figure></p>
-<p>如果要删除评论请到<a href="https://leancloud.cn/" target="_blank" rel="noopener">Leancloud</a>里删除哦<br><img src="/2019/01/30/Github-Pages-Blog/comment-delete.png" alt="删除评论"></p>
+<h3 id="编写命令行工具"><a href="#编写命令行工具" class="headerlink" title="编写命令行工具"></a>编写命令行工具</h3><p>首先创建项目结构<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">|-jvmgo</span><br><span class="line">    |-ch01</span><br></pre></td></tr></table></figure></p>
+<p>在ch01目录下创建cmd.go文件<br><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> <span class="string">"flag"</span></span><br><span class="line"><span class="keyword">import</span> <span class="string">"fmt"</span></span><br><span class="line"><span class="keyword">import</span> <span class="string">"os"</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">//用法: java [-options] class [args...] (执行类)</span></span><br><span class="line"><span class="comment">//或  java [-options] -jar jarfile [args...] (执行 jar 文件)</span></span><br><span class="line"><span class="keyword">type</span> Cmd <span class="keyword">struct</span> &#123;</span><br><span class="line">	helpFlag <span class="keyword">bool</span></span><br><span class="line">	versionFlag <span class="keyword">bool</span></span><br><span class="line">	cpOption <span class="keyword">string</span></span><br><span class="line">	class <span class="keyword">string</span></span><br><span class="line">	args []<span class="keyword">string</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">//把命令的用法打印到控制台</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">printUsage</span><span class="params">()</span></span>  &#123;</span><br><span class="line">	fmt.Printf(<span class="string">"Usage：%s [-options] class [args...]\n"</span>,os.Args[<span class="number">0</span>])</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//命令解析</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">parseCmd</span><span class="params">()</span> *<span class="title">Cmd</span></span> &#123;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">//声明cmd为指向空的Cmd对象的指针</span></span><br><span class="line">	cmd := &amp;Cmd&#123;&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">//定义flag参数</span></span><br><span class="line">	<span class="comment">//Usage是一个函数，默认输出所有定义了的命令行参数和帮助信息</span></span><br><span class="line">	flag.Usage = printUsage</span><br><span class="line">	flag.BoolVar(&amp;cmd.helpFlag,<span class="string">"help"</span>,<span class="literal">false</span>,<span class="string">"print help message"</span>)</span><br><span class="line">	flag.BoolVar(&amp;cmd.helpFlag,<span class="string">"?"</span>,<span class="literal">false</span>,<span class="string">"print help message"</span>)</span><br><span class="line">	flag.BoolVar(&amp;cmd.versionFlag,<span class="string">"version"</span>,<span class="literal">false</span>,<span class="string">"print version and exit"</span>)</span><br><span class="line">	flag.StringVar(&amp;cmd.cpOption,<span class="string">"classpath"</span>,<span class="string">""</span>,<span class="string">"classpath"</span>)</span><br><span class="line">	flag.StringVar(&amp;cmd.cpOption,<span class="string">"cp"</span>,<span class="string">""</span>,<span class="string">"classpath"</span>)</span><br><span class="line">	<span class="comment">//在所有的flag定义完成之后，可以通过调用flag.Parse()进行解析。</span></span><br><span class="line">	flag.Parse()</span><br><span class="line">	<span class="comment">//flag.Args()可以捕获未被解析的参数</span></span><br><span class="line">	args := flag.Args()</span><br><span class="line">	<span class="keyword">if</span> <span class="built_in">len</span>(args) &gt; <span class="number">0</span>&#123;</span><br><span class="line">		cmd.class = args[<span class="number">0</span>]</span><br><span class="line">		cmd.args = args[<span class="number">1</span>:]</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> cmd</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="测试代码"><a href="#测试代码" class="headerlink" title="测试代码"></a>测试代码</h3><p>在ch01目录下创建main.go文件<br><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> <span class="string">"fmt"</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	cmd := parseCmd()</span><br><span class="line">	<span class="keyword">if</span> cmd.versionFlag &#123;</span><br><span class="line">		fmt.Println(<span class="string">"version 0.0.1"</span>)</span><br><span class="line">	&#125;<span class="keyword">else</span> <span class="keyword">if</span> cmd.helpFlag || cmd.class == <span class="string">""</span>&#123;</span><br><span class="line">		printUsage()</span><br><span class="line">	&#125;<span class="keyword">else</span> &#123;</span><br><span class="line">		startJVM(cmd)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//模拟启动jvm</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">startJVM</span><span class="params">(cmd *Cmd)</span></span>  &#123;</span><br><span class="line">	<span class="comment">//还未开始写，暂时打印</span></span><br><span class="line">	fmt.Printf(<span class="string">"classpath:%s class:%s args:%v\n"</span>,cmd.cpOption,cmd.class,cmd.args)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>编译main.go，并测试-version<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ go install jvmgo/ch01 </span><br><span class="line">$ ch01 -version</span><br><span class="line">version 0.0.1</span><br></pre></td></tr></table></figure></p>
 
           
         
@@ -786,6 +1026,10 @@
   </section>
 
   
+  <nav class="pagination">
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right"></i></a>
+  </nav>
+
 
 
           </div>
@@ -831,7 +1075,7 @@
               
                 <a href="/archives">
               
-                  <span class="site-state-item-count">3</span>
+                  <span class="site-state-item-count">6</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -853,7 +1097,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">10</span>
+                  <span class="site-state-item-count">11</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
