@@ -500,6 +500,7 @@ void listRewindTail(list *list, listIter *li) {
 ```
 ### listRotate-将链表尾移动到表头
 ```c
+/
  * 取出链表的表尾节点，并将它移动到表头，成为新的表头节点。
  * @param list 
  * T = O(1)
