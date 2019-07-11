@@ -6,7 +6,7 @@
 
 
 <html class="theme-next mist use-motion" lang="zh-Hans">
-<head><meta name="generator" content="Hexo 3.8.0">
+<head><meta name="generator" content="Hexo 3.9.0">
   <meta charset="UTF-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
@@ -249,6 +249,181 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://a19140312.github.io/2019/07/09/C++-01/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="guyuqing">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="qing's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/07/09/C++-01/" itemprop="url">C++强制类型转换</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-07-09T20:17:00+08:00">
+                2019-07-09
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
+                  <a href="/categories/C/" itemprop="url" rel="index">
+                    <span itemprop="name">C++</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2019/07/09/C++-01/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count valine-comment-count" data-xid="/2019/07/09/C++-01/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="C语言类型转换"><a href="#C语言类型转换" class="headerlink" title="C语言类型转换"></a>C语言类型转换</h2><p>c语言类型转换有如下两种(旧式转型)<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">(T)expression  <span class="comment">//将 expression 转型为T</span></span><br><span class="line">T(expression)  <span class="comment">//将 expression 转型为T</span></span><br></pre></td></tr></table></figure></p>
+<h2 id="C-新式类型转换"><a href="#C-新式类型转换" class="headerlink" title="C++新式类型转换"></a>C++新式类型转换</h2><p>C++类型转换有如下四种<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const_cast</span>&lt;T&gt;(expression)</span><br><span class="line"><span class="keyword">dynamic_cast</span>&lt;T&gt;(expression)</span><br><span class="line"><span class="keyword">reinterpret_cast</span>&lt;T&gt;(expression)</span><br><span class="line"><span class="keyword">static_cast</span>&lt;T&gt;(expression)</span><br></pre></td></tr></table></figure></p>
+<h3 id="const-cast"><a href="#const-cast" class="headerlink" title="const_cast"></a>const_cast</h3><p>一般用于移除对象的const与volatile。如下图所示，b可以修改a的值。但是注意，编译器会进行优化，将数字常量1替代a常量。所以<code>cout &lt;&lt; a &lt;&lt; endl;</code>输出为1。<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> <span class="built_in">std</span>;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span> *argv[])</span> </span>&#123;</span><br><span class="line">	<span class="keyword">const</span> <span class="keyword">int</span> a = <span class="number">1</span>;</span><br><span class="line">	<span class="keyword">int</span>* b = <span class="keyword">const_cast</span>&lt;<span class="keyword">int</span>*&gt; (&amp;a);</span><br><span class="line">	*b = <span class="number">2</span>;</span><br><span class="line">	<span class="built_in">cout</span> &lt;&lt; a &lt;&lt; <span class="string">" "</span> &lt;&lt; *(&amp;a) &lt;&lt; <span class="string">" "</span> &lt;&lt; *b &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 输出：1 2 2</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="dynamic-cast"><a href="#dynamic-cast" class="headerlink" title="dynamic_cast"></a>dynamic_cast</h3><p>dynamic_cast 主要作用是将指向<strong>派生类对象</strong>的<strong>基类指针或引用</strong>，安全的转换为指向<strong>派生类对象</strong>的<strong>派生类指针或引用</strong>，并使用转换后的指针调用派生类独有的函数(非虚函数)。如果转换指针转换失败，则将返回空指针；如果转换引用失败，则将会抛出一个名为std::bad_cast的异常。<br>在如下3种情况中转换可以成功</p>
+<ul>
+<li>expression的类型与待转换类型相同。则转换必定成功。</li>
+<li>expression的类型为待转换类型的公有派生类。(指针向上转换)</li>
+<li>expression的类型为待转换类型的公有基类时，必须满足以下两个要求，才会转换成功，否则转换失败。(指针向下转换)<ul>
+<li>当expression为指向派生类的指针或引用派生类对象的基类引用。</li>
+<li>基类中必须包含虚函数，也就是必须具备多态性。</li>
+</ul>
+</li>
+</ul>
+<p>假设有如下两个类<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;string&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> <span class="built_in">std</span>;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Base</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	Base() &#123;&#125;</span><br><span class="line">	Base(<span class="built_in">string</span> s) : str(s) &#123;&#125;</span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">Print</span><span class="params">()</span> </span>&#123;<span class="built_in">cout</span> &lt;&lt; str &lt;&lt; <span class="built_in">endl</span>;&#125;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">	<span class="built_in">string</span> str;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Derived</span> :</span> <span class="keyword">public</span> Base &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	Derived() &#123;&#125;</span><br><span class="line">	Derived(<span class="built_in">string</span> s, <span class="keyword">int</span> i) : Base(s), ival(i) &#123;&#125;</span><br><span class="line">	<span class="function"><span class="keyword">void</span> <span class="title">Print</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		Base::Print();</span><br><span class="line">		<span class="built_in">cout</span> &lt;&lt; ival &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="function"><span class="keyword">void</span> <span class="title">PrintIval</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="built_in">cout</span> &lt;&lt; ival &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">	&#125;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">	<span class="keyword">int</span> ival;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>example:<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span> *argv[])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="comment">//基类指针指向派生类对象，基类中包含虚函数，符合向下转换规则。</span></span><br><span class="line">	Base* b = <span class="keyword">new</span> Derived(<span class="string">"test"</span>, <span class="number">1</span>);</span><br><span class="line">	<span class="comment">//使用基类指针无法调用派生类独有的函数，编译无法通过</span></span><br><span class="line">	b-&gt;PrintIval();</span><br><span class="line">	<span class="comment">//类型转换至派生类指针就可以调用到派生类独有的函数</span></span><br><span class="line">	Derived* d = <span class="keyword">dynamic_cast</span>&lt;Derived*&gt; (b);</span><br><span class="line">	d-&gt;PrintIval();</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="reinterpret-cast"><a href="#reinterpret-cast" class="headerlink" title="reinterpret_cast"></a>reinterpret_cast</h3><p>reinterpret_cast 主要的作用为允许任意<strong>长度相同</strong>的对象之间进行转换，而转换的安全性，则全部由程序员所保证，它只关注对象之间长度是否相同，长度不相同则无法通过编译。注意，<strong>reinterpret_cast无法去掉源对象的const、volatile属性</strong>。<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span> *argv[])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">char</span> a = <span class="number">1</span>;</span><br><span class="line">	<span class="comment">//将a的指针转化为长整型数</span></span><br><span class="line">	<span class="keyword">long</span> b = <span class="keyword">reinterpret_cast</span>&lt;<span class="keyword">long</span>&gt;(&amp;a);</span><br><span class="line">	<span class="comment">//将空指针转化为长整型数</span></span><br><span class="line">	<span class="keyword">long</span> d = <span class="keyword">reinterpret_cast</span>&lt;<span class="keyword">long</span>&gt;(<span class="literal">NULL</span>);</span><br><span class="line">	<span class="comment">//编译报错 int 4字节，而指针8字节</span></span><br><span class="line">	<span class="keyword">int</span> e = <span class="keyword">reinterpret_cast</span>&lt;<span class="keyword">int</span>&gt;(&amp;a);</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>需注意在32位机器上，指针为4字节，而在64位机器上，指针为8字节。</p>
+<h3 id="static-cast"><a href="#static-cast" class="headerlink" title="static_cast"></a>static_cast</h3><p>static_cast 类似C语言强制类型转换，它可以完成如下一些转换</p>
+<ul>
+<li>编译器隐式执行的类型转换，如int与float、double与char、enum与int之间的转换等。(精度大-&gt;精度小使用位截断处理)</li>
+<li>将任意类型表达式转换为void类型，或从void*指针中找回其中的值。</li>
+<li>基类与派生类指针或引用类型之间的转换，注意，由派生类转换至基类时(向上转换)是安全的，由基类至派生类转换时(向下转换)是非安全的。<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span> *argv[])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">char</span> a = <span class="string">'a'</span>;</span><br><span class="line">	<span class="comment">//将 char -&gt; int</span></span><br><span class="line">	<span class="keyword">int</span> i = <span class="keyword">static_cast</span>&lt;<span class="keyword">int</span>&gt;(a);</span><br><span class="line">	</span><br><span class="line">	Base* b = <span class="keyword">new</span> Base(<span class="string">"123"</span>);</span><br><span class="line">	<span class="comment">//将 Base 转换为 void*</span></span><br><span class="line">	<span class="keyword">void</span>* v = <span class="keyword">static_cast</span>&lt;<span class="keyword">void</span>*&gt;(b);</span><br><span class="line">	<span class="comment">//将 *void 转换为 Base</span></span><br><span class="line">	b = <span class="keyword">static_cast</span>&lt;Base*&gt;(v);</span><br><span class="line">	</span><br><span class="line">	Derived* d = <span class="keyword">new</span> Derived(<span class="string">"123"</span>, <span class="number">123</span>);</span><br><span class="line">	<span class="comment">//向上转换 将Derived* 转换为 Base*</span></span><br><span class="line">	Base* bb = <span class="keyword">static_cast</span>&lt;Base*&gt;(d);</span><br><span class="line">	<span class="comment">//向下转换 将Base* 转换为 Derived*</span></span><br><span class="line">	Derived* dd = <span class="keyword">static_cast</span>&lt;Derived*&gt;(b);</span><br><span class="line">	<span class="comment">//未定义的行为!非常危险!父类对象并不包含该函数，编译不会报错!</span></span><br><span class="line">	dd-&gt;PrintIval();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+
+          
+        
+      
+    </div>
+    
+    
+    
+    
+    
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://a19140312.github.io/2019/06/02/Project-Module/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
@@ -390,6 +565,412 @@
 <p>Client does not support authentication protocol requested by server; consider upgrading MySQL client</p>
 </blockquote>
 <p>解决方法登录mysql：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ALTER USER <span class="string">'root'</span>@<span class="string">'localhost'</span> IDENTIFIED WITH mysql_native_password BY <span class="string">'qwertyui'</span>;</span><br><span class="line">SELECT plugin FROM mysql.user WHERE User = <span class="string">'root'</span>;</span><br></pre></td></tr></table></figure></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+    
+    
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://a19140312.github.io/2019/05/25/Kafka-Background/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="guyuqing">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="qing's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/05/25/Kafka-Background/" itemprop="url">Kafka背景及架构介绍</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-05-25T11:38:04+08:00">
+                2019-05-25
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
+                  <a href="/categories/Kafka/" itemprop="url" rel="index">
+                    <span itemprop="name">Kafka</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="Kafka创建背景"><a href="#Kafka创建背景" class="headerlink" title="Kafka创建背景"></a>Kafka创建背景</h2><p>kafka最初是LinkedIn的一个内部基础设施系统。最初开发的起因是，LinkedIn虽然有了数据库和其他系统可以用来存储数据，但是缺乏一个可以帮助处理持续数据流的组件。它的设计目的是提供一个高性能的消息系统，可以处理多种类型数据，并能够实时提供纯洁且结构化的用户活动数据和系统度量指标。</p>
+<h2 id="Kafka简介"><a href="#Kafka简介" class="headerlink" title="Kafka简介"></a>Kafka简介</h2><p>Kafka是由LinkedIn开发，使用Scala编写的一个分布式的消息系统，具有高性能、持久化、多副本备份、横向扩展能力。生产者往队列里写消息，消费者从队列里取消息进行业务逻辑。一般在架构设计中起到解耦、削峰、异步处理的作用。</p>
+<p>kafka对外使用topic的概念，生产者往topic里写消息，消费者从读消息。为了做到水平扩展，一个topic实际是由多个partition组成的，遇到瓶颈时，可以通过增加partition的数量来进行横向扩容。单个parition内是保证消息有序。</p>
+<p>每新写一条消息，kafka就是在对应的文件append写，所以性能非常高。</p>
+<h2 id="Kafka架构"><a href="#Kafka架构" class="headerlink" title="Kafka架构"></a>Kafka架构</h2><h3 id="一、名词解释"><a href="#一、名词解释" class="headerlink" title="一、名词解释"></a>一、名词解释</h3><ul>
+<li><strong>Broker</strong>：消息中间件处理节点（服务器），一个节点就是一个broker，一个Kafka集群由一个或多个broker组成</li>
+<li><strong>Topic</strong>：Kafka对消息进行归类，发送到集群的每一条消息都要指定一个topic</li>
+<li><strong>Partition</strong>：物理上的概念，每个topic包含一个或多个partition，一个partition对应一个文件夹，这个文件夹下存储partition的数据和索引文件，每个partition内部是有序的</li>
+<li><strong>Producer</strong>：生产者，负责发布消息到broker</li>
+<li><strong>Consumer</strong>：消费者，从broker读取消息</li>
+<li><strong>ConsumerGroup</strong>：每个consumer属于一个特定的consumer group，可为每个consumer指定group name，若不指定，则属于默认的group，一条消息可以发送到不同的consumer group，但一个consumer group中只能有一个consumer能消费这条消息</li>
+<li><strong>replica</strong>：partition 的副本，保障 partition 的高可用。</li>
+<li><strong>leader</strong>：replica 中的一个角色， producer 和 consumer 只跟 leader 交互。</li>
+<li><strong>follower</strong>：replica 中的一个角色，从 leader 中复制数据。</li>
+<li><strong>controller</strong>：每个集群都有一个broker同时充当了集群控制器角色（自动从集群的活跃成员中选举出来），负责管理工作包括分配分区给broker，监控broker等等</li>
+<li><strong>zookeeper</strong>：Kafka 通过 zookeeper 来存储集群的 meta 信息。</li>
+</ul>
+<h3 id="二、架构图"><a href="#二、架构图" class="headerlink" title="二、架构图"></a>二、架构图</h3><h4 id="总体数据流"><a href="#总体数据流" class="headerlink" title="总体数据流"></a>总体数据流</h4><p><img src="/2019/05/25/Kafka-Background/1.png" alt=""><br>Producers往Brokers里面的指定Topic中写消息，Consumers从Brokers里面拉去指定Topic的消息，然后进行业务处理。</p>
+<h4 id="生产者"><a href="#生产者" class="headerlink" title="生产者"></a>生产者</h4><p><img src="/2019/05/25/Kafka-Background/2.png" alt=""><br>①首先要构造一个 ProducerRecord 对象，该对象可以声明主题Topic、分区Partition、键 Key以及值 Value，主题和值是必须要声明的，分区和键可以不用指定。</p>
+<p>②调用send() 方法进行消息发送。</p>
+<p>③因为消息要到网络上进行传输，所以必须进行序列化，序列化器的作用就是把消息的 key 和 value对象序列化成字节数组。</p>
+<p>④接下来数据传到分区器，如果之间的 ProducerRecord 对象指定了分区，那么分区器将不再做任何事，直接把指定的分区返回；如果没有，那么分区器会根据 Key 来选择一个分区，选择好分区之后，生产者就知道该往哪个主题和分区发送记录了。</p>
+<p>⑤接着这条记录会被添加到一个记录批次里面，这个批次里所有的消息会被发送到相同的主题和分区。会有一个独立的线程来把这些记录批次发送到相应的 Broker 上。</p>
+<p>③Broker成功接收到消息，表示发送成功，返回消息的元数据（包括主题和分区信息以及记录在分区里的偏移量）。发送失败，可以选择重试或者直接抛出异常。</p>
+<p>key的作用：可以为消息的附加消息，也可以用来决定消息该被写到哪个主题分区，拥有相同key的消息将会被写到同一分区</p>
+<h4 id="topic"><a href="#topic" class="headerlink" title="topic"></a>topic</h4><p><img src="/2019/05/25/Kafka-Background/3.jpg" alt=""><br>从上图可以看出，Topic中数据是顺序不可变序列，采用log追加方式写入，因而kafka中无因随机写入导致性能低下的问题。</p>
+<p>Topic的数据可存储在多个partition中，即可存放在不同的服务器上。这可使Topic大小不限于一台server容量。同时，消息存在多个partition上，可以实现Topic上消息的并发访问。</p>
+<h4 id="partition"><a href="#partition" class="headerlink" title="partition"></a>partition</h4><p><img src="/2019/05/25/Kafka-Background/4.jpg" alt=""></p>
+<p>每个 Partition 中的消息都是有序的，生产的消息被不断追加到 Partition log 上，其中的每一个消息都被赋予了一个唯一的 offset 值。 因此数据不会因消费而丢失，所以只要consumer指定offset，一个消息可被不同的consumer多次消费。</p>
+<p>kafka中只能保证partition中记录是有序的，而不保证topic中不同partition的顺序。</p>
+<p>分区的原因：</p>
+<ul>
+<li>方便在集群中扩展，每个 Partition 可以通过调整以适应它所在的机器，而一个 topic 又可以有多个 Partition 组成，因此整个集群就可以适应任意大小的数据了;</li>
+<li>可以提高并发，因为可以以 Partition 为单位读写了。</li>
+</ul>
+<h4 id="Replication"><a href="#Replication" class="headerlink" title="Replication"></a>Replication</h4><p>同一个 partition 可能会有多个 replication(对应 server.properties 配置中的 default.replication.factor=N)。</p>
+<p>没有 replication 的情况下，一旦 broker 宕机，其上所有 patition 的数据都不可被消费，同时 producer 也不能再将数据存于其上的 patition。</p>
+<p>引入 replication 之 后，同一个 partition 可能会有多个 replication，而这时需要在这些 replication 之间选出一个 leader，producer 和 consumer 只与这个 leader 交互，其它 replication 作为 follower 从 leader 中复制数据。</p>
+<h3 id="消费者"><a href="#消费者" class="headerlink" title="消费者"></a>消费者</h3><p><img src="/2019/05/25/Kafka-Background/5.jpeg" alt=""><br>订阅topic是以一个消费组来订阅的，一个消费组里面可以有多个消费者。</p>
+<p>同一个消费组中的两个消费者，不会同时消费一个partition。换句话来说，<code>就是一个partition，只能被消费组里的一个消费者消费</code>，但是可以同时被多个消费组消费。</p>
+<p>因此，如果消费组内的消费者如果比partition多的话，那么就会有个别消费者一直空闲。</p>
+<h3 id="Kafka-Zookeeper-节点"><a href="#Kafka-Zookeeper-节点" class="headerlink" title="Kafka Zookeeper 节点"></a>Kafka Zookeeper 节点</h3><p><img src="/2019/05/25/Kafka-Background/6.png" alt=""></p>
+<h2 id="Kafka常见的应用场景"><a href="#Kafka常见的应用场景" class="headerlink" title="Kafka常见的应用场景"></a>Kafka常见的应用场景</h2><h4 id="1-消息队列"><a href="#1-消息队列" class="headerlink" title="1.消息队列"></a>1.消息队列</h4><p>比起大多数的消息系统来说，Kafka有更好的吞吐量，内置的分区，冗余及容错性，这让Kafka成为了一个很好的大规模消息处理应用的解决方案。 消息系统一般吞吐量相对较低，但是需要更小的端到端延时，并尝尝依赖于Kafka提供的强大的持久性保障。在这个领域，Kafka足以媲美传统消息系统， 如ActiveMQ或RabbitMQ。</p>
+<h4 id="2-行为跟踪"><a href="#2-行为跟踪" class="headerlink" title="2.行为跟踪"></a>2.行为跟踪</h4><p>行为跟踪是kafka基于发布订阅模式的扩展应用，当我们跟踪用户浏览页面、搜索及其他行为时，以发布-订阅的模式实时记录到对应的topic里那么这些结果被订阅者拿到后，就可以做进一步的实时处理，或实时监控，或放到hadoop/离线数据仓库里处理。</p>
+<h4 id="3-元信息监控"><a href="#3-元信息监控" class="headerlink" title="3.元信息监控"></a>3.元信息监控</h4><p>与行为跟踪相似，作为操作记录的监控模块来使用，即汇集记录一些操作信息，可以理解为运维性质的数据监控吧。</p>
+<h4 id="4-日志收集"><a href="#4-日志收集" class="headerlink" title="4.日志收集"></a>4.日志收集</h4><p>日志收集方面，其实开源产品有很多，包括Scribe、Apache Flume。很多人使用Kafka代替日志聚合（log aggregation）。日志聚合一般来说是从服务器上收集日志文件，然后放到一个集中的位置（文件服务器或分布式文件系统）进行处理。然而Kafka忽略掉文件的细节，将其更清晰地抽象成一个个日志或事件的消息流。这就让Kafka处理过程延迟更低，更容易支持多数据源和分布式数据处理。比其他系统Kafka具有更高的扩展性，高效的性能和因为复制导致的更高的耐用性保证，以及更低的端到端延迟。</p>
+<h4 id="5-流处理"><a href="#5-流处理" class="headerlink" title="5.流处理"></a>5.流处理</h4><p>保存收集上游的流数据，以提供到下游的Storm或其他流式计算框架进行处理。很多用户会将那些从原始topic来的数据进行阶段性处理，汇总，扩充或者以其他的方式转换到新的topic下再继续后面的处理。例如一个文章推荐的处理流程，可能是先从数据源中抓取文章的内容，然后将其丢入一个叫做“文章”的topic中；后续操作可能是需要对这个内容进行清理，比如回复正常数据或者删除重复数据，最后再将内容匹配的结果返还给用户。这就在一个独立的topic之外，产生了一系列的实时数据处理的流程。Strom和Samza是非常著名的实现这种类型数据转换的框架。</p>
+<h4 id="6-持久性日志（commit-log）"><a href="#6-持久性日志（commit-log）" class="headerlink" title="6.持久性日志（commit log）"></a>6.持久性日志（commit log）</h4><p>Kafka可以为一种外部的持久性日志的分布式系统提供服务。这种日志可以在节点之外进行持久性日志的记录，节点间备份数据，并为故障节点数据回复提供一种重新同步的机制。Kafka中提供了日志压缩功能，日志压缩之后整体的日志状态仍然保留，并且通过日志回溯可以实现持久性日志的功能。在这种用法中，Kafka类似于Apache BookKeeper项目。</p>
+<h4 id="7-事件源"><a href="#7-事件源" class="headerlink" title="7.事件源"></a>7.事件源</h4><p>将状态转移作为按时间顺序排列的记录序列，这种序列可以按时间回溯整个事件的状态变更，kafka本身的持久性，代表着他可以存储大量的日志，并且这些可以根据这些日志进行汇总和回溯等等。</p>
+<p><code>实际应用中，适用最多最广泛的自然是MQ的功能。</code></p>
+<h2 id="Kafka用作MQ时与常用MQ的对比"><a href="#Kafka用作MQ时与常用MQ的对比" class="headerlink" title="Kafka用作MQ时与常用MQ的对比"></a>Kafka用作MQ时与常用MQ的对比</h2><p><strong>RabbitMQ</strong>——Rabbit Message Queue的简写，但不能仅仅理解其为消息队列，消息代理更合适。 RabbitMQ是一个由Erlang 语言开发的AMQP（高级消息队列协议）的开源实现。 RabbitMQ作为一个消息代理，主要和消息打交道，负责接收并转发消息。</p>
+<p><strong>ZeroMQ</strong>——是一个基于消息队列的多线程网络库，其对套接字类型、连接处理、帧、甚至路由的底层细节进行抽象，提供跨越多种传输协议的套接字。是网络通信中新的一层，<code>介于应用层和传输层之间</code>（按照TCP/IP划分），其是一个可伸缩层，可并行运行，分散在分布式系统间。</p>
+<p><strong>RocketMQ</strong>——阿里开源的一款高性能、高吞吐量的分布式消息中间件。</p>
+<p><strong>ActiveMQ</strong>——是一种开源的，实现了JMS1.1规范的，面向消息(MOM)的中间件，为应用程序提供高效的、可扩展的、稳定的和安全的企业级消息通信。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">特性</th>
+<th style="text-align:center">Kafka</th>
+<th style="text-align:center">RabbitMQ</th>
+<th style="text-align:center">ZeroMQ</th>
+<th style="text-align:center">RocketMQ</th>
+<th style="text-align:center">ActiveMQ</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">开发语言</td>
+<td style="text-align:center">Scala</td>
+<td style="text-align:center">Erlang</td>
+<td style="text-align:center">C</td>
+<td style="text-align:center">Java</td>
+<td style="text-align:center">Java</td>
+</tr>
+<tr>
+<td style="text-align:center">支持协议</td>
+<td style="text-align:center">自行设计的基于TCP层的协议</td>
+<td style="text-align:center">AMQP</td>
+<td style="text-align:center">TCP、UDP</td>
+<td style="text-align:center">自行设计</td>
+<td style="text-align:center">OpenWire、STOMP、REST、MQTT、XMPP、AMQP、WS</td>
+</tr>
+<tr>
+<td style="text-align:center">消息存储</td>
+<td style="text-align:center">内存、磁盘、数据库。支持大量堆积。</td>
+<td style="text-align:center">内存、磁盘。支持少量堆积。</td>
+<td style="text-align:center">消息发送端的内存或者磁盘中。不支持持久化。</td>
+<td style="text-align:center">磁盘。支持大量堆积。</td>
+<td style="text-align:center">内存、磁盘、数据库。支持少量堆积。</td>
+</tr>
+<tr>
+<td style="text-align:center">消息事务</td>
+<td style="text-align:center">支持</td>
+<td style="text-align:center">支持</td>
+<td style="text-align:center">不支持</td>
+<td style="text-align:center">支持</td>
+<td style="text-align:center">支持</td>
+</tr>
+<tr>
+<td style="text-align:center">负载均衡</td>
+<td style="text-align:center">支持</td>
+<td style="text-align:center">支持但支持的不好</td>
+<td style="text-align:center">去中心化，不支持负载均衡。本身只是一个多线程网络库。</td>
+<td style="text-align:center">支持</td>
+<td style="text-align:center">支持，可以基于zookeeper实现</td>
+</tr>
+<tr>
+<td style="text-align:center">集群方式</td>
+<td style="text-align:center">天然的‘‘Leader-Slave’无状态集群，每台服务器既是Master也是Slave。</td>
+<td style="text-align:center">支持简单集群，’复制’模式，对高级集群模式支持不好。</td>
+<td style="text-align:center">去中心化，不支持集群。</td>
+<td style="text-align:center">‘Master-Slave’ 模式，开源版本需手动切换Slave变成Master</td>
+<td style="text-align:center">支持简单集群模式，比如’主-备’，对高级集群模式支持不好。</td>
+</tr>
+<tr>
+<td style="text-align:center">可用性</td>
+<td style="text-align:center">非常高（分布式）</td>
+<td style="text-align:center">高（主从）</td>
+<td style="text-align:center">高</td>
+<td style="text-align:center">非常高（分布式）</td>
+<td style="text-align:center">高（主从）</td>
+</tr>
+<tr>
+<td style="text-align:center">消息重复</td>
+<td style="text-align:center">支持at least once、at most once</td>
+<td style="text-align:center">支持at least once、at most once</td>
+<td style="text-align:center">只有重传机制，但是没有持久化，消息丢了重传也没有用。既不是at least once、也不是at most once、更不是exactly only once</td>
+<td style="text-align:center">支持at least once</td>
+<td style="text-align:center">支持at least once</td>
+</tr>
+<tr>
+<td style="text-align:center">吞吐量TPS</td>
+<td style="text-align:center">极大</td>
+<td style="text-align:center">比较大</td>
+<td style="text-align:center">极大</td>
+<td style="text-align:center">大（发送端不是批量发送）</td>
+<td style="text-align:center">比较大</td>
+</tr>
+<tr>
+<td style="text-align:center">时效性</td>
+<td style="text-align:center">ms以内</td>
+<td style="text-align:center">us级</td>
+<td style="text-align:center"></td>
+<td style="text-align:center">ms级</td>
+<td style="text-align:center">ms级</td>
+</tr>
+<tr>
+<td style="text-align:center">订阅形式和消息分发</td>
+<td style="text-align:center">基于topic以及按照topic进行正则匹配的发布订阅模式。</td>
+<td style="text-align:center">提供了4种方式：direct, topic ,Headers和fanout。</td>
+<td style="text-align:center">点对点(p2p)</td>
+<td style="text-align:center">基于topic/messageTag以及按照消息类型、属性进行正则匹配的发布订阅模式</td>
+<td style="text-align:center">点对点(p2p)、广播（发布-订阅）</td>
+</tr>
+<tr>
+<td style="text-align:center">顺序消息</td>
+<td style="text-align:center">支持</td>
+<td style="text-align:center">不支持</td>
+<td style="text-align:center">不支持</td>
+<td style="text-align:center">支持</td>
+<td style="text-align:center">不支持</td>
+</tr>
+<tr>
+<td style="text-align:center">消息确认</td>
+<td style="text-align:center">支持</td>
+<td style="text-align:center">支持</td>
+<td style="text-align:center">支持</td>
+<td style="text-align:center">支持</td>
+<td style="text-align:center">支持</td>
+</tr>
+<tr>
+<td style="text-align:center">消息回溯</td>
+<td style="text-align:center">支持指定分区offset位置的回溯</td>
+<td style="text-align:center">不支持</td>
+<td style="text-align:center">不支持</td>
+<td style="text-align:center">支持指定时间点的回溯</td>
+<td style="text-align:center">不支持</td>
+</tr>
+<tr>
+<td style="text-align:center">消费失败重试</td>
+<td style="text-align:center">不支持，但可以通过指定分区offset位置实现。</td>
+<td style="text-align:center">不支持，但是可以利用消息确认机制实现。</td>
+<td style="text-align:center">不支持</td>
+<td style="text-align:center">支持</td>
+<td style="text-align:center">不支持</td>
+</tr>
+<tr>
+<td style="text-align:center">并发度</td>
+<td style="text-align:center">高</td>
+<td style="text-align:center">极高</td>
+<td style="text-align:center">高</td>
+<td style="text-align:center">高</td>
+<td style="text-align:center">高</td>
+</tr>
+<tr>
+<td style="text-align:center">资料文档</td>
+<td style="text-align:center">中。有kafka作者自己写的书，网上资料也有一些。</td>
+<td style="text-align:center">多。有一些不错的书，网上资料多。</td>
+<td style="text-align:center">少。没有专门写zeromq的书，网上的资料多是一些代码的实现和简单介绍。</td>
+<td style="text-align:center">少。没有专门写rocketmq的书，网上的资料良莠不齐，官方文档很简洁，但是对技术细节没有过多的描述。</td>
+<td style="text-align:center">多。没有专门写activemq的书，网上资料多。</td>
+</tr>
+</tbody>
+</table>
+<h3 id="常用MQ的优缺点"><a href="#常用MQ的优缺点" class="headerlink" title="常用MQ的优缺点"></a>常用MQ的优缺点</h3><h4 id="Kafka"><a href="#Kafka" class="headerlink" title="Kafka"></a>Kafka</h4><h5 id="优点"><a href="#优点" class="headerlink" title="优点"></a>优点</h5><ul>
+<li>性能卓越，单机写入TPS约在百万条/秒，最大的优点，就是吞吐量高。</li>
+<li>时效性：ms级</li>
+<li>可用性：非常高，kafka是分布式的，一个数据多个副本，少数机器宕机，不会丢失数据，不会导致不可用</li>
+<li>消费者采用Pull方式获取消息, 消息有序, 通过控制能够保证所有消息被消费且仅被消费一次;</li>
+<li>有优秀的第三方Kafka Web管理界面Kafka-Manager；</li>
+<li>在日志领域比较成熟，被多家公司和多个开源项目使用；</li>
+<li>功能支持：功能较为简单，主要支持简单的MQ功能，在大数据领域的实时计算以及日志采集被大规模使用</li>
+</ul>
+<h5 id="缺点"><a href="#缺点" class="headerlink" title="缺点"></a>缺点</h5><ul>
+<li>Kafka单机超过64个队列/分区，Load会发生明显的飙高现象，队列越多，load越高，发送消息响应时间变长</li>
+<li>使用短轮询方式，实时性取决于轮询间隔时间；</li>
+<li>消费失败不支持重试；</li>
+<li>支持消息顺序，但是一台代理宕机后，就会产生消息乱序；</li>
+<li>社区更新较慢；</li>
+</ul>
+<h4 id="RabbitMQ"><a href="#RabbitMQ" class="headerlink" title="RabbitMQ"></a>RabbitMQ</h4><h5 id="优点-1"><a href="#优点-1" class="headerlink" title="优点"></a>优点</h5><ul>
+<li>由于erlang语言的特性，mq 性能较好，高并发；</li>
+<li>吞吐量到万级，MQ功能比较完备 </li>
+<li>健壮、稳定、易用、跨平台、支持多种语言、文档齐全；</li>
+<li>开源提供的管理界面非常棒，用起来很好用</li>
+<li>社区活跃度高；</li>
+</ul>
+<h5 id="缺点-1"><a href="#缺点-1" class="headerlink" title="缺点"></a>缺点</h5><ul>
+<li>erlang开发，很难去看懂源码，基本职能依赖于开源社区的快速维护和修复bug，不利于做二次开发和维护。</li>
+<li>RabbitMQ确实吞吐量会低一些，这是因为他做的实现机制比较重。</li>
+<li>需要学习比较复杂的接口和协议，学习和维护成本较高。</li>
+</ul>
+<h4 id="ZeroMQ"><a href="#ZeroMQ" class="headerlink" title="ZeroMQ"></a>ZeroMQ</h4><h5 id="优点-2"><a href="#优点-2" class="headerlink" title="优点"></a>优点</h5><ul>
+<li>吞吐量：百万级</li>
+<li>扩展性强，其他MQ都已经是成形的产品，已经是一款应用程序了。而ZeroMQ说白了就是一组库函数。</li>
+</ul>
+<h5 id="缺点-2"><a href="#缺点-2" class="headerlink" title="缺点"></a>缺点</h5><ul>
+<li>原生不支持持久化，仅支持相当有限的本地缓存，如需要消息持久化需要自己进行扩展。</li>
+<li>在高并发环境下不会出问题，但是有可能会导致本地的缓存区被塞满而导致消息丢失的情况。</li>
+</ul>
+<h4 id="RocketMQ"><a href="#RocketMQ" class="headerlink" title="RocketMQ"></a>RocketMQ</h4><h5 id="优点-3"><a href="#优点-3" class="headerlink" title="优点"></a>优点</h5><ul>
+<li>单机吞吐量：十万级</li>
+<li>可用性：非常高，分布式架构</li>
+<li>消息可靠性：经过参数优化配置，消息可以做到0丢失</li>
+<li>功能支持：MQ功能较为完善，还是分布式的，扩展性好</li>
+<li>支持10亿级别的消息堆积，不会因为堆积导致性能下降</li>
+<li>源码是java，我们可以自己阅读源码，定制自己公司的MQ，可以掌控</li>
+</ul>
+<h5 id="缺点-3"><a href="#缺点-3" class="headerlink" title="缺点"></a>缺点</h5><ul>
+<li>支持的客户端语言不多，目前是java及c++，其中c++不成熟；</li>
+<li>社区活跃度一般</li>
+<li>MQ核心代码未遵循JMS规范，有些系统要迁移需要修改大量代码</li>
+</ul>
+<h4 id="RocketMQ-1"><a href="#RocketMQ-1" class="headerlink" title="RocketMQ"></a>RocketMQ</h4><h5 id="优点-4"><a href="#优点-4" class="headerlink" title="优点"></a>优点</h5><ul>
+<li>单机吞吐量：万级</li>
+<li>topic数量都吞吐量的影响：</li>
+<li>时效性：ms级</li>
+<li>可用性：高，基于主从架构实现高可用性</li>
+<li>消息可靠性：有较低的概率丢失数据</li>
+<li>功能支持：MQ领域的功能极其完备</li>
+<li>遵循JMS规范安装部署方便</li>
+</ul>
+<h5 id="缺点-4"><a href="#缺点-4" class="headerlink" title="缺点"></a>缺点</h5><ul>
+<li>在并发较多时，消费端只能接收一部分，会出现丢失消息情况，需重启消费端才能接收到那部分剩下的消息。</li>
+<li>官方社区现在对ActiveMQ 5.x维护越来越少，较少在大规模吞吐的场景中使用。</li>
+</ul>
 
           
         
@@ -735,301 +1316,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://a19140312.github.io/2019/03/13/Redis/">
-
-    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="guyuqing">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.png">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="qing's blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2019/03/13/Redis/" itemprop="url">redis常见面试题</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-03-13T22:33:04+08:00">
-                2019-03-13
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category">
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
-                  <a href="/categories/redis/" itemprop="url" rel="index">
-                    <span itemprop="name">redis</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h4 id="什么是redis"><a href="#什么是redis" class="headerlink" title="什么是redis?"></a>什么是redis?</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Redis 是一个基于内存的高性能key-value数据库。</span><br></pre></td></tr></table></figure>
-<h4 id="Redis支持哪几种数据结构"><a href="#Redis支持哪几种数据结构" class="headerlink" title="Redis支持哪几种数据结构"></a>Redis支持哪几种数据结构</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">String（字符串）: <span class="built_in">set</span> key value</span><br><span class="line">Hash（哈希）: hmset name  key1 value1 key2 value2</span><br><span class="line">List（列表）：lpush  name  value</span><br><span class="line">Set（集合）：sadd  name  value</span><br><span class="line">zset(sorted <span class="built_in">set</span>：有序集合)： zadd  name score value</span><br></pre></td></tr></table></figure>
-<h4 id="Redis为什么这么快？redis采用多线程会有哪些问题？"><a href="#Redis为什么这么快？redis采用多线程会有哪些问题？" class="headerlink" title="Redis为什么这么快？redis采用多线程会有哪些问题？"></a>Redis为什么这么快？redis采用多线程会有哪些问题？</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Redis效率高的主要原因有下面几个：</span><br><span class="line"></span><br><span class="line">    （1）基于内存操作，速度非常快</span><br><span class="line">    （2）采用单线程，避免了上下文的切换导致消耗CPU</span><br><span class="line">    （3）采用单线程，不用去考虑各种加锁释放锁的问题</span><br><span class="line">    （4）使用IO多路复用模型，非阻塞IO</span><br></pre></td></tr></table></figure>
-<h4 id="什么是Redis持久化？Redis有哪几种持久化方式？优缺点是什么？"><a href="#什么是Redis持久化？Redis有哪几种持久化方式？优缺点是什么？" class="headerlink" title="什么是Redis持久化？Redis有哪几种持久化方式？优缺点是什么？"></a>什么是Redis持久化？Redis有哪几种持久化方式？优缺点是什么？</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Redis 提供了两种持久化方式:RDB（默认） 和AOF </span><br><span class="line">RDB:当前内存中的数据集快照写入磁盘,恢复时是将快照文件直接读到内存里。</span><br><span class="line">AOF:将Redis执行的每次写命令记录到单独的日志文件中,当Redis重启时再次执行AOF文件中的命令来恢复数据。</span><br></pre></td></tr></table></figure>
-<h4 id="一个字符串类型的值能存储最大容量是多少？"><a href="#一个字符串类型的值能存储最大容量是多少？" class="headerlink" title="一个字符串类型的值能存储最大容量是多少？"></a>一个字符串类型的值能存储最大容量是多少？</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">512M</span><br></pre></td></tr></table></figure>
-<h4 id="Redis集群方案什么情况下会导致整个集群不可用？"><a href="#Redis集群方案什么情况下会导致整个集群不可用？" class="headerlink" title="Redis集群方案什么情况下会导致整个集群不可用？"></a>Redis集群方案什么情况下会导致整个集群不可用？</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">有A，B，C三个节点的集群,在没有&lt;复制模型&gt;的情况下.</span><br><span class="line">如果节点B失败了，那么整个集群就会以为缺少5501-11000这个范围的槽而不可用。</span><br></pre></td></tr></table></figure>
-<h4 id="Redis哈希槽的概念？"><a href="#Redis哈希槽的概念？" class="headerlink" title="Redis哈希槽的概念？"></a>Redis哈希槽的概念？</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Redis集群没有使用一致性<span class="built_in">hash</span>,而是引入了哈希槽的概念.</span><br><span class="line">Redis集群有 16384 个哈希槽，每个key通过CRC16校验后对16384取模来决定放置哪个槽.</span><br><span class="line">集群的每个节点负责一部分<span class="built_in">hash</span>槽。</span><br></pre></td></tr></table></figure>
-<h4 id="Redis集群的主从复制模型？"><a href="#Redis集群的主从复制模型？" class="headerlink" title="Redis集群的主从复制模型？"></a>Redis集群的主从复制模型？</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">为了使在部分节点失败或者大部分节点无法通信的情况下集群仍然可用，</span><br><span class="line">所以集群使用了主从复制模型,每个节点都会有N-1个复制品.</span><br></pre></td></tr></table></figure>
-<h4 id="Redis事务相关的命令有哪几个？"><a href="#Redis事务相关的命令有哪几个？" class="headerlink" title="Redis事务相关的命令有哪几个？"></a>Redis事务相关的命令有哪几个？</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">discard命令-取消事务,发起执行事务块里的所有命令.</span><br><span class="line"><span class="built_in">exec</span>命令-执行所有事务块内的命令.</span><br><span class="line">multi命令-标记一个事务块的开始.</span><br><span class="line">watch命令-监视一个（或多个）key，如果在执行事务之前这些key被其他命令所改动，事务将被打断.</span><br><span class="line">unwatch命令-取消watch命令对所有key的监视.</span><br></pre></td></tr></table></figure>
-<h4 id="redis的过期策略"><a href="#redis的过期策略" class="headerlink" title="redis的过期策略"></a>redis的过期策略</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">redis采用的是定期删除+惰性删除策略。</span><br><span class="line"></span><br><span class="line">定期删除：redis默认每个100ms检查，是否有过期的key（随机抽取key进行检查）,有过期key则删除。</span><br><span class="line">因此，如果只采用定期删除策略，会导致很多key到时间没有删除。</span><br><span class="line"></span><br><span class="line">惰性删除：在你获取某个key的时候，redis会检查一下，这个key如果设置了过期时间那么是否过期了？如果过期了此时就会删除。</span><br></pre></td></tr></table></figure>
-<h4 id="为什么不用定时删除策略"><a href="#为什么不用定时删除策略" class="headerlink" title="为什么不用定时删除策略?"></a>为什么不用定时删除策略?</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">定时删除,用一个定时器来负责监视key,过期则自动删除。</span><br><span class="line">虽然内存及时释放，但是十分消耗CPU资源。</span><br><span class="line">在大并发请求下，CPU要将时间应用在处理请求，而不是删除key,因此没有采用这一策略.</span><br></pre></td></tr></table></figure>
-
-          
-        
-      
-    </div>
-    
-    
-    
-    
-    
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://a19140312.github.io/2019/02/14/JVM3/">
-
-    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="guyuqing">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.png">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="qing's blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2019/02/14/JVM3/" itemprop="url">《自己动手写JAVA虚拟机》学习笔记三【解析class文件】</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-02-14T11:38:04+08:00">
-                2019-02-14
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category">
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
-                  <a href="/categories/JVM/" itemprop="url" rel="index">
-                    <span itemprop="name">JVM</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>java虚拟机规范中使用一种类似C语言结构体来描述Class文件的基本结构，具体如下：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">ClassFile &#123;</span><br><span class="line">     u4             magic;<span class="comment">//魔数</span></span><br><span class="line">     u2             minor_version;<span class="comment">//主版本号</span></span><br><span class="line">     u2             major_version;<span class="comment">//次版本号</span></span><br><span class="line">     u2             constant_pool_count;<span class="comment">//常量池长度</span></span><br><span class="line">     cp_info        constant_pool[constant_pool_count-<span class="number">1</span>];<span class="comment">//常量池信息</span></span><br><span class="line">     u2             access_flags;<span class="comment">//该类的访问修饰符</span></span><br><span class="line">     u2             this_class;<span class="comment">//类索引</span></span><br><span class="line">     u2             super_class;<span class="comment">//父类索引</span></span><br><span class="line">     u2             interfaces_count;<span class="comment">//接口个数</span></span><br><span class="line">     u2             interfaces[interfaces_count];<span class="comment">//接口详细信息</span></span><br><span class="line">     u2             fields_count;<span class="comment">//属性个数</span></span><br><span class="line">     field_info     fields[fields_count];<span class="comment">//属性详细信息</span></span><br><span class="line">     u2             methods_count;<span class="comment">//方法个数</span></span><br><span class="line">     method_info    methods[methods_count];<span class="comment">//方法详情</span></span><br><span class="line">     u2             attributes_count;<span class="comment">//类文件属性个数</span></span><br><span class="line">     attribute_info attributes[attributes_count];<span class="comment">//类文件属性详细信息</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<h3 id="准备工作"><a href="#准备工作" class="headerlink" title="准备工作"></a>准备工作</h3><p>把ch02的目录结构复制一份改名ch03，在ch03的目录中创建一个classfile子目录。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">|-jvmgo</span><br><span class="line">    |-ch01</span><br><span class="line">    |-ch01</span><br><span class="line">    |-ch03</span><br><span class="line">        |-classfile</span><br><span class="line">        |-classpath</span><br><span class="line">        |-cmd.go</span><br><span class="line">        |-main.go</span><br></pre></td></tr></table></figure></p>
-<p>为了学习编译后的class文件，新建一个classFileTest.java然后编译<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ClassFileTest</span> </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">boolean</span> FLAG = <span class="keyword">true</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">byte</span> BYTE = <span class="number">123</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">char</span> X = <span class="string">'X'</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">short</span> SHORT = <span class="number">12345</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> INT = <span class="number">123456789</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">long</span> LONG = <span class="number">12345678901L</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">float</span> PI = <span class="number">3.14f</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">double</span> E = <span class="number">2.71828</span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> RuntimeException </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"Hello, World!"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>用作者提供的<a href="https://github.com/zxh0/classpy" target="_blank" rel="noopener">classpy</a>的图形化工具，可以查看反编译后的class文件。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-    
-    
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1082,7 +1368,7 @@
               
                 <a href="/archives">
               
-                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-count">10</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -1093,7 +1379,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">4</span>
+                  <span class="site-state-item-count">6</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -1104,7 +1390,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">13</span>
+                  <span class="site-state-item-count">15</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
