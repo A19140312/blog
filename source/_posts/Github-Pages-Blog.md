@@ -7,6 +7,7 @@ tags:
     - 教程
     - blog
 categories: blog
+author: Guyuqing
 copyright: true
 comments: true
 ---
@@ -285,3 +286,131 @@ $ hexo new '文章名'
 ```
 如果要删除评论请到[Leancloud](https://leancloud.cn/)里删除哦
 ![删除评论](Github-Pages-Blog/comment-delete.png)
+
+### hexo添加多作者
+在项目目录下执行
+
+``` bash
+$ npm install hexo-generator-author --save
+```
+
+在文章的头部添加author信息，如下：
+``` markdown
+title: 测试文章
+tags:
+  - Testing
+  - Another Tag
+---
+author: Alice
+```
+
+修改/layout/_macro/下的post.swig文件 +为新添加的行
+```swig
+         <div class="post-meta">
++          <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
++            <a href="/authors/{{ post.author }}" itemprop="url" rel="index">
++              <span itemprop="name">{{ post.author }}</span>
++            </a>
++          </span>
+           <span class="post-time">
+             <span class="post-meta-item-icon">
+               <i class="fa fa-calendar-o"></i>
+
+```
+在/layout下新创建author.swig文件
+```swig
+
+{% extends '_layout.swig' %}
+{% import '_macro/post-collapse.swig' as post_template %}
+{% import '_macro/sidebar.swig' as sidebar_template %}
+
+{% block title %} {{ __('title.author') }}: {{ page.author }} | {{ config.title }} {% endblock %}
+
+{% block content %}
+
+  <div class="post-block category">
+
+    <div id="posts" class="posts-collapse">
+      <div class="collection-title">
+
+        <{% if theme.seo %}h2{% else %}h1{% endif %}>{#
+        #}{{ page.author }}{#
+        #}<small>{{  __('title.author')  }}</small>
+        </{% if theme.seo %}h2{% else %}h1{% endif %}>
+      </div>
+
+      {% for post in page.posts %}
+        {{ post_template.render(post) }}
+      {% endfor %}
+    </div>
+
+  </div>
+
+  {% include '_partials/pagination.swig' %}
+
+{% endblock %}
+
+{% block sidebar %}
+  {{ sidebar_template.render(false) }}
+{% endblock %}
+
+```
+
+修改/layout下page.swig文件
+```swig
+
+     {{ __('title.category') + page_title_suffix }}
+   {% elif page.type === "tags" %}
+     {{ __('title.tag') + page_title_suffix }}
++  {% elif page.type === "authors" %}
++    {{ __('title.author') + page_title_suffix }}
+   {% else %}
+     {{ page.title + page_title_suffix }}
+   {% endif %}
+
+。。。。。。。
+           {{ list_categories() }}
+         </div>
+       </div>
++    {% elif page.type === 'authors' %}
++      <div class="author-all-page">
++        <div class="author-all-title">
++            {{ _p('counter.authors', site.authors.length) }}
++        </div>
++        <div class="author-all">
++          {{ list_authors() }}
++        </div>
++      </div>
+     {% else %}
+       {{ page.content }}
+     {% endif %}
+```
+修改{项目名称}/themes/next下zh-Hans.yml文件
+```yml
+title:
+  archive: 归档
+  category: 分类
+  tag: 标签
+  schedule: 日程表
+  author : 作者
+  
+。。。
+
+counter:
+
+  authors:
+    zero: 暂无分类
+    one: 目前共计 1 个分类
+    other: "目前共计 %d 个作者"
+
+```
+
+在{项目名称}/themes/next/source/css/_common/components/pages/添加authors.styl，复制categories.styl内容将categorie改成author
+
+在同级文件pages.styl中添加@import "authors";
+
+修改之后，运行以下命令就可以再你的主页看到啦
+``` bash
+$  hexo clean
+$  hexo d -g
+```
