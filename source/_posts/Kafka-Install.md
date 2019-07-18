@@ -10,7 +10,34 @@ author: Guyuqing
 copyright: true
 comments: false
 ---
-## 在MacOs上安装Kafka
+## MacOS Docker 安装
+```bash
+$ brew cask install docker
+Updating Homebrew...
+==> Auto-updated Homebrew!
+Updated 2 taps (homebrew/core and homebrew/cask).
+==> Updated Formulae
+docker ✔            esptool             link-grammar        overmind
+abcm2ps             exploitdb           metabase            perltidy
+angular-cli         firebase-cli        minio               pjproject
+babel               grails              minio-mc            png++
+balena-cli          kubernetes-cli      monero              terragrunt
+bit                 kustomize           netlify-cli         v8
+docker-completion   libstatgrab         nim
+
+==> Satisfying dependencies
+==> Downloading https://download.docker.com/mac/stable/31259/Docker.dmg
+######################################################################## 100.0%
+==> Verifying SHA-256 checksum for Cask 'docker'.
+==> Installing Cask docker
+==> Creating Caskroom at /usr/local/Caskroom
+==> We'll set permissions properly so we won't need sudo in the future.
+Password:
+==> Moving App 'Docker.app' to '/Applications/Docker.app'.
+🍺  docker was successfully installed!
+```
+
+## MacOs Kafka 安装
 
 ```bash
 ~ » brew install kafka                                 
