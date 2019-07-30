@@ -26,6 +26,7 @@ public class HelloWorld {
  * 扩展类路径(extention classpath)：扩展类路径默认对应jre/lib/ext目录，使用Java扩展机制的类位于该路径。
  * 用户类路径(user classpath)：我们自己实现的类，以及第三方类库则位于用户类路径。用户类路径的默认值是当前路径，也就是”.”，可以给java命令传递-classpath选项来指定。
 
+<!-- more -->
 ### 准备工作
 
 把ch01的目录结构复制一份改名ch02，在ch02的目录中创建一个classpath子目录。

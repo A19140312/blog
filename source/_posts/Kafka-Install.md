@@ -20,6 +20,7 @@ comments: false
 ~ » docker pull wurstmeister/kafka:latest
 ~ » docker pull sheepkiller/kafka-manager
 ```
+<!-- more -->
 ### 启动容器
 1、创建网络：由于要涉及到zookeeper和kafka之间的通信，所以我们运用docker内部容器通信机制先新建一个网络。
 ```bash

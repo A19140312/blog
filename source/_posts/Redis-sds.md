@@ -33,7 +33,7 @@ struct sdshdr {
 };
 
 ```
-
+<!-- more -->
 ## SDS常用函数
 
 ### sdslen-sds长度

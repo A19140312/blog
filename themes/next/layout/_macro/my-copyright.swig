@@ -1,6 +1,6 @@
 {% if page.copyright %}
 <div class="my_post_copyright">
-  <script src="//cdn.bootcss.com/clipboard.js/1.5.10/clipboard.min.js"></script>
+  <script src="//cdn.bootcss.com/clipboard.min.js/1.5.10/clipboard.min.js"></script>
 
   <!-- JS库 sweetalert 可修改路径 -->
   <script src="https://cdn.bootcss.com/jquery/2.0.0/jquery.min.js"></script>

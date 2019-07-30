@@ -32,6 +32,7 @@ ClassFile {
      attribute_info attributes[attributes_count];//类文件属性详细信息
 }
 ```
+<!-- more -->
 ### 准备工作
 
 把ch02的目录结构复制一份改名ch03，在ch03的目录中创建一个classfile子目录。

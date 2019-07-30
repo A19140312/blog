@@ -65,6 +65,7 @@ typedef struct list {
 
 } list;
 ```
+<!-- more -->
 ![list](Redis-adlist/list.png)
 ## list常用函数
 

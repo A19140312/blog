@@ -13,6 +13,7 @@ comments: false
 ```bash
 $ echo '.idea' >> .gitignore
 ```
+<!-- more -->
 
 2.从git中删除idea：
 ```bash

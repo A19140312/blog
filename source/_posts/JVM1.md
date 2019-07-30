@@ -25,6 +25,7 @@ comments: false
 ～$ go version
 go version go1.11.2 darwin/amd64
 ```
+<!-- more -->
 设置环境变量
 ```bash
 #添加Go的运行环境路径
