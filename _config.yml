@@ -98,7 +98,7 @@ live2d:
   enable: true
   pluginRootPath: live2dw/
   pluginJsPath: lib/
-  pluginModelPath: assets/ Relative)
+  pluginModelPath: assets/
 
   # 脚本加载源
   scriptFrom: local # 默认从本地加载脚本
@@ -110,7 +110,7 @@ live2d:
 
   # 选择看板娘模型
   model:
-    use: live2d-widget-model-shizuku  # npm package的名字
+    use: live2d-widget-model-z16  # npm package的名字
     # use: wanko # /live2d_models/ 目录下的模型文件夹名称
     # use: ./wives/wanko # 站点根目录下的模型文件夹名称
     # use: https://cdn.jsdelivr.net/npm/live2d-widget-model-wanko@1.0.5/assets/wanko.model.json # 自定义网络数据源
