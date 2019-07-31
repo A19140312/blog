@@ -81,10 +81,12 @@ theme: next       # 主题
 # 部署
 ## Docs: https://hexo.io/docs/deployment.html
 deploy:
-  type: git
-#  repository: https://github.com/A19140312/a19140312.github.io.git
-  branch: master
-  repo: root@123.56.47.170:blog.git
+  - type: git
+    repository: https://github.com/A19140312/a19140312.github.io.git
+    branch: master
+  - type: git
+    repo: root@123.56.47.170:blog.git
+    branch: master
 
 post_end_tag:
   enabled: true  # 是否开启文末的本文结束标记
