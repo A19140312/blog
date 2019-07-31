@@ -131,3 +131,8 @@ search:
   field: post
   format: html
   limit: 10000
+
+admin:
+  username: admin
+  password_hash: $2a$10$ZYaH6gdMRkdiqX8iiBzUgu/EBDCr/PSHVCH9bNy6m0w26zrybOAqO
+  secret: a secret something
