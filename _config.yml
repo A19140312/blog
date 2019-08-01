@@ -123,8 +123,6 @@ live2d:
     width: 200 # 宽度
     height: 280 # 高度
     superSample: 2
-    hOffset: 0
-    vOffset: -20
   mobile:
     show: true
     scale: 0.5
