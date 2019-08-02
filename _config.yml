@@ -6,7 +6,7 @@
 title: qing's blog     # 网站标题
 subtitle:              # 网站副标题
 description:           # 网站描述
-#author: guyuqing       # 你的昵称
+author: guyuqing       # 你的昵称
 language: zh-Hans      # 网站使用的语言(英文:en, 简体中文:zh-Hans，繁体中文:zh-tw)
 timezone:              # 网站时区，用于生成页面时填充相关时间，默认使用电脑时区，一般不用改
 

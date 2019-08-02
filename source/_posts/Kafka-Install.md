@@ -137,7 +137,7 @@ wurstmeister/kafka:latest
 -e ZK_HOSTS=zookeeper:2181 \
 sheepkiller/kafka-manager
 ```
-访问ip:9090即可
+访问ip:9000即可
 
 5、测试Kafka
 进入kafka容器
