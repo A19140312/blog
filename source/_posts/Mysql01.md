@@ -8,7 +8,6 @@ categories: Mysql
 author: Guyuqing
 copyright: true
 comments: false
-password: 12345
 ---
 #### 数据库
 > 数据库是文件的集合，是依照某种数据模型组织起来并存放于二级存储器中的数据集合。
