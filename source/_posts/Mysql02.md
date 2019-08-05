@@ -9,7 +9,7 @@ copyright: true
 comments: false
 date: 2019-07-31 11:34:00
 ---
-## 概述
+# 概述
 
 * InnoDB存储引擎最早由Innobase Oy公司开发，被包括在MySQL数据库所有的二进制发行版本中，
 * 从MySQL 5.5版本开始是默认的表存储引擎<font color=gray>（之前的版本InnoDB存储引擎仅在Windows下为默认的存储引擎）</font>
@@ -17,19 +17,19 @@ date: 2019-07-31 11:34:00
 * 特点：行锁设计、支持 MVCC、支持外键、提供一致性非锁定读、有效利用内存和 CPU
 <!-- more -->
 
-## 体系架构
+# 体系架构
 ![innoDB体系结构图](Mysql02/1.png)
 InnoDB存储引擎是由内存池、后台线程、磁盘存储三大部分组成。
 
-### 线程
+## 线程
 
 InnoDB 使用的是多线程模型, 其后台有多个不同的线程负责处理不同的任务
 
-#### Master Thread
+### Master Thread
 
 Master Thread是最核心的一个后台线程，主要负责将缓冲池中的数据异步刷新到磁盘，保证数据的一致性。包括脏页刷新、合并插入缓冲、UNDO页的回收等。
 
-#### IO Thread
+### IO Thread
 
 在 InnoDB 存储引擎中大量使用了异步IO(Async IO)来处理写IO请求, IO Thread的工作主要是负责这些 IO 请求的回调。
 
@@ -57,7 +57,7 @@ Master Thread是最核心的一个后台线程，主要负责将缓冲池中的�
 </tr>
 </table>  
 
-#### Purge Thread
+### Purge Thread
 
 事务提交后，其所使用的undo log可能不再需要，因此需要Purge Thread来回收已经分配并使用的UNDO页。
 
@@ -86,21 +86,20 @@ Master Thread是最核心的一个后台线程，主要负责将缓冲池中的�
 </tr>
 </table>                                  
 
-#### Page Cleaner Thread
+### Page Cleaner Thread
 
 Page Cleaner Thread的作用是取代Master Thread中脏页刷新的操作，
 减轻原Master Thread的工作及对于用户查询线程的阻塞，进一步提高性能。
 * 1.2.x 版本引入
 
-### 内存
+## 内存
 ![innoDB内存的结构](Mysql02/2.png)
 
 innoDB内存主要由缓冲池(innodb buffer pool)、重做日志缓冲(redo log buffer)、额外内存池组成(innodb additional men pool size)组成
-缓冲池中缓存的数据页类型有：索引页、数据页、undo页、插入缓冲（insert buffer）、自适应哈希索引（adaptive hash index）、InnoDB存储的锁信息（lock info）、数据字典信息（data dictionary）等。
 
-#### 缓冲池
-innodb 是基础磁盘存储的，将记录按照页的方式进行管理，是基础磁盘的数据库系统。
-基于磁盘的数据库系统通常使用 **缓冲池** 技术来提高数据库的整体性能。
+### 缓冲池
+缓冲池是主存储器中的一个区域，用于在访问时缓存表和索引数据。缓冲池允许直接从内存处理常用数据，从而加快处理速度。
+在专用服务器上，通常会将最多80％的物理内存分配给缓冲池。
 * **读** 
     * 将从磁盘读到的页存放在缓冲池中 也称将页**fix**在缓冲池中
     * 下一次读相同的页的时候，判断是不是在缓冲池里面 ？直接读该页 ：读磁盘
@@ -121,11 +120,68 @@ innodb 是基础磁盘存储的，将记录按照页的方式进行管理，是�
 |参数|版本|作用|
 |:---:|:---:|:---:|
 |innodb_buffer_pool_instances|从InnoDB 1.0.x开始|配置多个缓冲池实例，默认为1|
-|SHOW ENGINE INNODB STATUS|从InnoDB 1.0.x开始|观察每个缓冲池实例对象运行状态|
-|information_schema下的表<br>INNODB_BUFFER_POOL_STATS|MySQL 5.6开始|观察各个缓冲池使用状态|
  
+#### 缓存的数据页类型
+ 
+* 索引页
+* 数据页
+* undo页
+* 插入缓冲（insert buffer）
+* 自适应哈希索引（adaptive hash index）
+* InnoDB存储的锁信息（lock info）
+* 数据字典信息（data dictionary）
 
+ 
+#### 缓冲池管理方式
+ 1. **LRU list** 
+     **LRU算法**：最频繁使用页在LRU列表的前端，最少使用的页在尾端。首先释放LRU列表中的尾端的页。缓冲池中页的大小默认为16KB。
+     **InnoDB优化的LRU算法(midpoint insertion strategy)**：将新读取到的页不放在首部，而是中间部位 `midpoint` 位置。目标是确保频繁访问"热"页面保留在缓冲池中。
+     ![lru](Mysql02/innodb-buffer-pool-list.jpg)
 
+     <table>
+     <tr>
+         <th>参数</th>
+         <th colspan="2">作用</th>
+     </tr>
+     <tr>
+         <td style="text-align:center"> innodb_old_blocks_pct </td>
+         <td colspan="2">控制LRU列表中 old list 的百分比。<br>
+            默认值为 37，对应于原始固定比率3/8。<br>
+            值范围是 5（缓冲池中的新页面很快就会老化）到 95。
+         </td>
+     </tr>
+     <tr>
+         <td style="text-align:center"> innodb_old_blocks_time </td>
+         <td colspan="2">指定第一次访问页面之后的时间窗口（ms）<br>
+            在此期间可以访问该页面而不移动到LRU列表的前端<br>
+            默认值为 1000 ms
+         </td>
+     </tr>
+     </table> 
+     
+     默认情况下，算法操作如下：
+     * 在默认配置下， `midpoint`位置在LRU list 的5/8处。
+     * `midpoint`是new sublist的尾部与old sublist的头部相交的边界。
+     * 当 InnoDB 将页面读入缓冲池时，将页插入`midpoint`位置(old sublist的头部)。
+     * 访问old sublist中的页 && 该页在old sublist中的停留时间超过innodb_old_blocks_time设置的时间，使其变`young`,将其移动到缓冲池的头部(new sublist的头部)。
+     * 当页从LRU列表的old部分加入到new部分时，称此时发生的操作为`page made young`，而因为innodb_old_blocks_time的设置而导致页没有从old部分移动到new部分的操作称为`page not made young`
+     * 在数据库操作中，被访问的页将移到new sublist的表头，这样一来，在new sublist中的未被访问的节点将逐渐往表尾移动，当移动过中点，将变为old list的节点。当表满时，old list末尾的页将会被移除。
+     
+ {% note warning %}
+ 为什么不采用朴素的LRU？
+ 因为某些SQL操作会访问很多页，甚至全部页，但仅仅在该次查询操作，并不是活跃的热点数据。可能会使缓冲池中的页被刷新出，从而影响缓冲池的效率。
+ {% endnote %}  
+ 
+ 2. **Free list**
+    当数据库刚启动时，LRU列表是空的，这时页都存放在Free list中。
+    当需要从缓冲池中分页时，从Free list中查找是否有可用的空闲页，若有则将该页从Free列表中删除，放入到LRU列表中。
+ 3. **Flush list**               
+    在LRU类表的页被修改后，称为脏页（Dirty Page），即缓存和硬盘的页数据不一致。
+    数据库会通过`CHECKPOINT`机制将脏页刷新回磁盘，Flush list中的页即为脏页列表。
+
+### 重做日志缓冲  
+                                                              
+      
 参考：https://chyroc.cn/posts/innodb-storage-engine-reading-1/
                                                                  
 
