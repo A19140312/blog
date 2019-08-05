@@ -13,7 +13,8 @@
 
   <div class="theme-info">
     <div class="powered-by"></div>
-    <span class="post-count">博客全站共{{ totalcount(site) }}字</span>
+    <i class="fa fa-book"></i>
+    <span class="post-count">全站共{{ totalcount(site) }}字</span>
   </div>
   {% if theme.post_wordcount.totalcount %}
     <span class="post-meta-divider">|</span>

@@ -90,7 +90,7 @@ deploy:
 
 post_end_tag:
   enabled: true  # 是否开启文末的本文结束标记
-  icon: paw # 结束标记之间的图标
+  icon: angellist # 结束标记之间的图标
 
 # Live2D
 # https://github.com/EYHN/hexo-helper-live2d
