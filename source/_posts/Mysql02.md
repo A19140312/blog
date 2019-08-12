@@ -228,6 +228,23 @@ innoDB内存主要由缓冲池(innodb buffer pool)、重做日志缓冲(redo log
    3) 重做日志不可用时，刷新脏页
 {% endnote %} 
 
+innodb 内部有两种 checkpoint：
+    * sharp checkpoint： 
+        数据库关闭的时候将所有的脏页刷回到磁盘，默认方式，参数 innodb_fast_shudown=1
+    * fuzzy checkpoint：只刷新部分脏页
+        * master thread checkpoint：master thread 异步的以每秒或者每 10 秒的速度从缓冲池的脏页列表中刷新一定比列的也回磁盘
+        * flush_lru_list checkpoint：InnoDB要保证LRU列表中需要有差不多100个空闲页可供使用。如果没有这么多，就会将 lru list 尾部的页移除。如果这些页有脏页，就需要进行 checkpoint。
+            * innodb 1.1.x版本之前，检查在用户查询线程中,会阻塞用户查询操作。
+            * innodb 1.2.x版本之后，检查放到了单独的 page cleaner 线程中,可通过 **innodb_lru_scan_depth** 控制lru列表中可用页的数量，默认是1024。
+        * async/sync flush checkpoint：重做日志文件不可用时，强制将一些页刷新到磁盘。达到重做日志文件的大小阈值。
+        * dirty page too much checkpoint：当缓冲池中脏页的数量占据一定百分比时，强制进行Checkpoint，用来保证缓冲池中有足够的页，通过 innodb_max_dirty_pages_pct 参数控制。
+            * innodb 1.0.x版本之前 ，参数默认值为90。
+            * innodb 1.0.x版本之后 ，参数默认值为75。
+                                             
+## Master thread 工作方式
+
+### InnoDB 1.0.x
 
 
 
+### InnoDB 1.2.x
