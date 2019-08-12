@@ -90,14 +90,13 @@ Master Thread是最核心的一个后台线程，主要负责将缓冲池中的�
 
 Page Cleaner Thread的作用是取代Master Thread中脏页刷新的操作，
 减轻原Master Thread的工作及对于用户查询线程的阻塞，进一步提高性能。
-* 1.2.x 版本引入
 
 ## 内存
 ![innoDB内存的结构](Mysql02/2.png)
 
-innoDB内存主要由缓冲池(innodb buffer pool)、重做日志缓冲(redo log buffer)、额外内存池组成(innodb additional men pool size)组成
+innoDB内存主要由[缓冲池(innodb buffer pool)](#缓冲池)、[重做日志缓冲(redo log buffer)](#重做日志缓冲)、[额外内存池组成(innodb additional men pool size)](#额外的内存池)组成
 
-### 缓冲池(InnoDB Buffer Pool)
+### 缓冲池
 缓冲池是主存储器中的一个区域，用于在访问时缓存表和索引数据。缓冲池允许直接从内存处理常用数据，从而加快处理速度。
 在专用服务器上，通常会将最多80％的物理内存分配给缓冲池。
 * **读** 
@@ -106,7 +105,7 @@ innoDB内存主要由缓冲池(innodb buffer pool)、重做日志缓冲(redo log
 * **写**
     * 修改缓冲池中的页
     * 以一定的频率刷新到磁盘
-    * 不是每次数据修改都刷新，而是通过`Checkpoint`机制刷新会磁盘
+    * 不是每次数据修改都刷新，而是通过[`Checkpoint`](#Checkpoint技术)机制刷新会磁盘
 
 因此缓冲池的大小影响数据库的整体性能。
 {% note info %}
@@ -188,7 +187,7 @@ innoDB内存主要由缓冲池(innodb buffer pool)、重做日志缓冲(redo log
     在LRU类表的页被修改后，称为脏页（Dirty Page），即缓存和硬盘的页数据不一致。
     数据库会通过`CHECKPOINT`机制将脏页刷新回磁盘，Flush list中的页即为脏页列表。
 
-### 重做日志缓冲(Redo Log Buffer)
+### 重做日志缓冲
    {% note info %}
     **什么是redo log？**
     当数据库对数据做修改的时候，需要把数据页从磁盘读到buffer pool中，然后在buffer pool中进行修改，那么这个时候buffer pool中的数据页就与磁盘上的数据页内容不一致，称buffer pool的数据页为dirty page 脏数据。
@@ -229,22 +228,202 @@ innoDB内存主要由缓冲池(innodb buffer pool)、重做日志缓冲(redo log
 {% endnote %} 
 
 innodb 内部有两种 checkpoint：
-    * sharp checkpoint： 
-        数据库关闭的时候将所有的脏页刷回到磁盘，默认方式，参数 innodb_fast_shudown=1
-    * fuzzy checkpoint：只刷新部分脏页
-        * master thread checkpoint：master thread 异步的以每秒或者每 10 秒的速度从缓冲池的脏页列表中刷新一定比列的也回磁盘
-        * flush_lru_list checkpoint：InnoDB要保证LRU列表中需要有差不多100个空闲页可供使用。如果没有这么多，就会将 lru list 尾部的页移除。如果这些页有脏页，就需要进行 checkpoint。
-            * innodb 1.1.x版本之前，检查在用户查询线程中,会阻塞用户查询操作。
-            * innodb 1.2.x版本之后，检查放到了单独的 page cleaner 线程中,可通过 **innodb_lru_scan_depth** 控制lru列表中可用页的数量，默认是1024。
-        * async/sync flush checkpoint：重做日志文件不可用时，强制将一些页刷新到磁盘。达到重做日志文件的大小阈值。
-        * dirty page too much checkpoint：当缓冲池中脏页的数量占据一定百分比时，强制进行Checkpoint，用来保证缓冲池中有足够的页，通过 innodb_max_dirty_pages_pct 参数控制。
-            * innodb 1.0.x版本之前 ，参数默认值为90。
-            * innodb 1.0.x版本之后 ，参数默认值为75。
+1. sharp checkpoint：数据库关闭的时候将所有的脏页刷回到磁盘，默认方式，参数 innodb_fast_shudown=1
+2. fuzzy checkpoint：只刷新部分脏页
+    - master thread checkpoint：master thread 异步的以每秒或者每 10 秒的速度从缓冲池的脏页列表中刷新一定比列的也回磁盘
+    - flush_lru_list checkpoint：InnoDB要保证LRU列表中需要有差不多100个空闲页可供使用。如果没有这么多，就会将 lru list 尾部的页移除。如果这些页有脏页，就需要进行 checkpoint。
+         - innodb 1.1.x版本之前，检查在用户查询线程中,会阻塞用户查询操作。
+         - innodb 1.2.x版本之后，检查放到了单独的 page cleaner 线程中,可通过 **innodb_lru_scan_depth** 控制lru列表中可用页的数量，默认是1024。
+    - async/sync flush checkpoint：重做日志文件不可用时，强制将一些页刷新到磁盘。达到重做日志文件的大小阈值。
+    - dirty page too much checkpoint：当缓冲池中脏页的数量占据一定百分比时，强制进行Checkpoint，用来保证缓冲池中有足够的页，通过 [innodb_max_dirty_pages_pct](#innodb_max_dirty_pages_pct) 参数控制。
                                              
 ## Master thread 工作方式
 
-### InnoDB 1.0.x
+### InnoDB 1.0.x 版本之前的 Master thread
+Master thread 内部有多个循环 loop 组成：
+* 主循环 loop
+* 后台循环 backgroup loop
+* 刷新循环 flush loop
+* 暂停循环 suspend loop
 
+伪代码如下：
 
+```java
+void master_thread()
+{
+	goto loop;
+	//主循环
+	loop ：
+	for(int i = 0; i < 10; ++i){
+		thread_sleep(1);
+		//1. 日志缓冲刷新到磁盘，即使事务还没有提交
+		do log buffer flush to disk;
+		//2. 根据前一秒IO操作小于5，合并插入缓冲
+		if(last_one_second_ios < 5)
+			do merge at most 5 insert buffer;
+		//3. 脏页的比例超过了阈值，刷新 100 个脏页到磁盘
+		if(buf_get_modified_ratio_pct > innodb_max_dirty_pages_pct)
+			do buffer pool flush 100 dirty page;
+		//4. 没有用户活动（数据库空闲时）或者数据库关闭（shutdown），切换到 backgroup loop
+		if(no user activity)
+			goto backgroud loop;
+	}
+	
+	//1. 前10秒IO操作小于200，刷新 100 个脏页到磁盘
+	if(last_ten_second_ios < 200)
+		do buffer pool flush 100 dirty page;
+	//2. 合并至多 5 个插入缓冲
+	do merge at most 5 insert buffer;
+	//3. 将重做日志刷新到磁盘
+	do log buffer flush to disk;
+	//4. 删除无用的 undo 页（每次最多尝试回收 20 个 undo 页）
+	do full purge;
+	//5. 脏页比例超过 70% 刷新100 个脏页到磁盘，否则刷新 10 个脏页
+	if ( buf_get_modified_ratio_pct ＞ 70 % )
+		do buffer pool flush 100 dirty page
+	else
+		buffer pool flush 10 dirty page
+																
+	goto loop
+	//后台循环																
+	background loop :
+	//1. 删除无用的 undo 页
+	do full purge
+	//2. 合并 20 个插入缓冲
+	do merge 20 insert buffer
+	//3.如果有任务，跳转到主循环，否则跳转到刷新循环
+	if not idle	
+		goto loop
+	else
+		goto flush loop
+	
+	//刷新循环
+	flush loop :
+	//不断刷新100个脏页，直到脏页比例没有超过阈值
+	do buffer pool flush 100 dirty page
+	if ( buf_get_modified_ratio_pct ＞ innodb_max_dirty_pages_pct )
+		goto flush loop
+	//没有任务，跳转到暂停循环
+	goto suspend loop
+	
+	//暂停循环
+	suspend loop :
+	//将主线程挂起，等待事件发生
+	suspend_thread()
+	waiting event
+	goto loop;
+}
 
-### InnoDB 1.2.x
+```
+### InnoDB 1.2.x 版本之前的 Master thread
+1. 提高刷新脏页数量和合并插入数量，改善磁盘 IO 处理能力,刷新数量不再硬编码，而是使用百分比控制。
+    * 在合并插入缓冲的时候，合并插入缓冲的数量为 [innodb_io_capacity](#innodb_io_capacity) 的 5%
+    * 在从缓冲区刷新脏页的时候，刷新脏页的数量为 [innodb_io_capacity](#innodb_io_capacity)
+2. 增加了自适应刷新脏页功能。
+    * 1.0.x之前版本：脏页在缓冲池占比小于[innodb_max_dirty_pages_pct](#innodb_max_dirty_pages_pct)，不刷新脏页，大于则刷新100个脏页
+    * 1.0.x版本开始：引入[innodb_adaptive_flushing](#innodb_adaptive_flushing)参数，通过函数buf_flush_get_desired_flush_rate判断产生重做日志的速度来决定最适合的刷新脏页数量。
+3. full purge回收的Undo页的数量也不再硬编码，使用参数[innodb_purge_batch_size](#innodb_purge_batch_size)控制。
+
+<table>
+<tr>
+    <th colspan="2">参数</th>
+    <th>InnoDB 版本</th>
+    <th colspan="3">作用</th>
+</tr>
+<tr>
+    <td colspan="2" style="text-align:center"><span id="innodb_io_capacity">innodb_io_capacity</span></td>
+    <td style="text-align:center"> 1.0.x开始 </td>
+    <td colspan="3">表示磁盘IO的吞吐量,默认值是200</td>
+</tr>
+<tr>
+    <td colspan="2" rowspan="2" style="text-align:center"><span id="innodb_max_dirty_pages_pct">innodb_max_dirty_pages_pct</span></td>
+    <td style="text-align:center"> 1.0.x之前 </td>
+    <td colspan="3">脏页在缓冲池中所占比率，默认值是90</td>
+</tr>
+<tr>
+    <td style="text-align:center"> 1.0.x开始</td>
+    <td colspan="3">默认值是75<br>加快刷新脏页的频率，保证了磁盘IO的负载。</td>                       
+</tr>
+<tr>
+    <td colspan="2" style="text-align:center"><span id="innodb_adaptive_flushing">innodb_adaptive_flushing</span></td>
+    <td style="text-align:center"> 1.0.x开始 </td>
+    <td colspan="3">是否自适应刷新脏页，默认为 ON</td>
+</tr>
+<tr>
+    <td colspan="2" style="text-align:center"><span id="innodb_purge_batch_size">innodb_purge_batch_size</span></td>
+    <td style="text-align:center"> 1.0.x开始 </td>
+    <td colspan="3">清除 undo 页时,表示一次删除多少页,默认是 20</td>
+</tr>
+</table>   
+
+Master Thread的伪代码变为了下面的形式：
+
+```java
+void master_thread()
+{
+	goto loop;
+	//主循环
+	loop ：
+	for(int i = 0; i < 10; ++i){
+		thread_sleep(1);
+		//1. 日志缓冲刷新到磁盘，即使事务还没有提交
+		do log buffer flush to disk;
+		//2. 根据前一秒IO操作小于5%innodb_io_capacity，合并插入缓冲
+		if(last_one_second_ios < 5%innodb_io_capacity)
+			do merge 5%innodb_io_capacity insert buffer;
+		//3. 脏页的比例超过了阈值，刷新 100%innodb_io_capacity 个脏页到磁盘
+		if(buf_get_modified_ratio_pct > innodb_max_dirty_pages_pct)
+			do buffer pool flush 100%innodb_io_capacity dirty page;
+		//4. 没有用户活动（数据库空闲时）或者数据库关闭（shutdown），切换到 backgroup loop
+		if(no user activity)
+			goto backgroud loop;
+	}
+	
+	//1. 前10秒IO操作小于innodb_io_capacity，刷新 innodb_io_capacity 个脏页到磁盘
+	if(last_ten_second_ios < innodb_io_capacity)
+		do buffer pool flush 100%innodb_io_capacity dirty page;
+	//2. 合并至多 5%innodb_io_capacity 个插入缓冲
+	do merge at most 5%innodb_io_capacity insert buffer;
+	//3. 将重做日志刷新到磁盘
+	do log buffer flush to disk;
+	//4. 删除无用的 undo 页（每次最多尝试回收 5%innodb_io_capacity 个 undo 页）
+	do full purge;
+	//5. 脏页比例超过 70% 刷新 100%innodb_io_capacity 个脏页到磁盘，
+	// 否则刷新 10%innodb_io_capacity 个脏页
+	if ( buf_get_modified_ratio_pct ＞ 70 % )
+		do buffer pool flush 100%innodb_io_capacity dirty page
+	else
+		buffer pool flush 10%innodb_io_capacity dirty page
+																
+	goto loop
+	//后台循环																
+	background loop :
+	//1. 删除无用的 undo 页
+	do full purge
+	//2. 合并 100%innodb_io_capacity 个插入缓冲
+	do merge 100%innodb_io_capacity insert buffer
+	//3.如果有任务，跳转到主循环，否则跳转到刷新循环
+	if not idle	
+		goto loop
+	else
+		goto flush loop
+	
+	//刷新循环
+	flush loop :
+	//不断刷新 100%innodb_io_capacity 个脏页，直到脏页比例没有超过阈值
+	do buffer pool flush 100%innodb_io_capacity dirty page
+	if ( buf_get_modified_ratio_pct ＞ innodb_max_dirty_pages_pct )
+		goto flush loop
+	//没有任务，跳转到暂停循环
+	goto suspend loop
+	
+	//暂停循环
+	suspend loop :
+	//将主线程挂起，等待事件发生
+	suspend_thread()
+	waiting event
+	goto loop;
+}
+
+```
+### InnoDB 1.2.x 版本的 Master thread
