@@ -102,10 +102,12 @@ innoDB内存主要由[缓冲池(innodb buffer pool)](#缓冲池)、[重做日志
 * **读** 
     * 将从磁盘读到的页存放在缓冲池中 也称将页**fix**在缓冲池中
     * 下一次读相同的页的时候，判断是不是在缓冲池里面 ？直接读该页 ：读磁盘
+    * ![流程图](Mysql02/read.svg)
 * **写**
     * 修改缓冲池中的页
     * 以一定的频率刷新到磁盘
     * 不是每次数据修改都刷新，而是通过[`Checkpoint`](#Checkpoint技术)机制刷新会磁盘
+    * ![流程图](Mysql02/write.svg)
 
 因此缓冲池的大小影响数据库的整体性能。
 {% note info %}
@@ -122,17 +124,11 @@ innoDB内存主要由[缓冲池(innodb buffer pool)](#缓冲池)、[重做日志
  
 #### 缓冲池中缓存的数据页类型
  
-* 索引页(index page)
-* 数据页(data page)
-* undo页(undo Log Page)
-* 插入缓冲（insert buffer）
-    在InnoDB引擎上进行插入操作时，一般需要按照主键顺序进行插入，这样才能获得较高的插入性能。当一张表中存在非聚簇的且不唯一的索引时，在插入时，数据页的存放还是按照主键进行顺序存放，但是对于非聚簇索引叶节点的插入不再是顺序的了，这时就需要离散的访问非聚簇索引页，由于随机读取的存在导致插入操作性能下降。
-    
-    InnoDB为此设计了Insert Buffer来进行插入优化。对于非聚簇索引的插入或者更新操作，不是每一次都直接插入到索引页中，而是先判断插入的非聚集索引是否在缓冲池中，若在，则直接插入；若不在，则先放入到一个Insert Buffer中。看似数据库这个非聚集的索引已经查到叶节点，而实际没有，这时存放在另外一个位置。然后再以一定的频率和情况进行Insert Buffer和非聚簇索引页子节点的合并操作。这时通常能够将多个插入合并到一个操作中，这样就大大提高了对于非聚簇索引的插入性能。
-* 自适应哈希索引（adaptive hash index）
-    InnoDB会根据访问的频率和模式，为热点页建立哈希索引，来提高查询效率。InnoDB存储引擎会监控对表上各个索引页的查询，如果观察到建立哈希索引可以带来速度上的提升，则建立哈希索引，所以叫做自适应哈希索引。
-    
-    自适应哈希索引是通过缓冲池的B+树页构建而来，因此建立速度很快，而且不需要对整张数据表建立哈希索引。其有一个要求，即对这个页的连续访问模式必须是一样的，也就是说其查询的条件(WHERE)必须完全一样，而且必须是连续的。
+* 索引页(index page)：缓存数据表索引
+* 数据页(data page)：缓存数据页，占缓冲池的绝大部分
+* undo页(undo Log Page)：undo页是保存事务，为回滚做准备的。
+* [插入缓冲](#插入缓冲)（insert buffer）：插入数据时要先插入到缓存池中。
+* 自适应哈希索引（adaptive hash index）： 除了B+ Tree索引外，在缓冲池还会维护一个哈希索引，以便在缓冲池中快速找到数据页。
 * InnoDB存储的锁信息（lock info）
 * 数据字典信息（data dictionary）
     数据字典是对数据库中的数据、库对象、表对象等的元信息的集合。
@@ -427,3 +423,135 @@ void master_thread()
 
 ```
 ### InnoDB 1.2.x 版本的 Master thread
+
+InnoDB 1.2.x 版本中再次对 Master Thread 进行了优化，伪代码如下：
+```java
+if InnoDB is idle
+//之前版本中每10秒的操作
+srv_master_do_idle_tasks();
+else
+//之前版本中每秒的操作
+srv_master_do_active_tasks();
+```
+对于刷新脏页的操作，从Master Thread线程分离到一个单独的Page Cleaner Thread，从而减轻了Master Thread的工作，同时进一步提高了系统的并发性。
+
+<div style="text-align:center;color:#bfbfbf;font-size:16px;">
+    <span>-------- 第二部分 --------</span>
+</div>
+
+## InnoDB 关键特性
+关键特性包括：
+* 插入缓冲 insert buffer
+* 两次写 double write
+* 自适应哈希索引 adaptive hash index
+* 异步 io async io
+* 刷新邻接页 flush neighbor page
+
+### 插入缓冲
+
+聚集索引(primary key)一般是顺序的，不需要磁盘的随机读取，插入效率高。
+而对于`非聚集索引`来说，叶子节点的插入不再有序，这时就需要离散访问非聚集索引页，插入性能变低。
+因此引入插入缓冲机制。
+
+对于`非聚集索引（非唯一）`的插入和更新有效，对于插入或更新操作,不是每一次直接插入索引页。
+而是先判断插入的非聚集索引页是否在缓冲池中。
+如果在,则直接插入,如果不再,则先放入一个插入缓冲区中。
+然后再以一定的频率执行插入缓冲和非聚集索引页子节点的合并操作。
+
+插入缓冲,不是缓冲池中的一个部分,而是**物理页**的一个组成部分。
+
+#### 1. insert buffer
+Insert Buffer的使用流程：
+![Insert Buffer的使用流程](Mysql02/Insert-Buffer.svg)
+
+插入缓冲的启用需要满足一下两个条件：
+1）索引是辅助索引（secondary index）
+2）索引不适合唯一的
+
+如果辅助索引是唯一的，就不能使用该技术，原因很简单，因为如果这样做，整个索引数据被切分为2部分，无法保证唯一性。
+
+插入缓冲主要带来如下两个坏处：
+1）可能导致数据库宕机后实例恢复时间变长。如果应用程序执行大量的插入和更新操作，且涉及非唯一的聚集索引，一旦出现宕机，这时就有大量内存中的插入缓冲区数据没有合并至索引页中，导致实例恢复时间会很长。
+2）在写密集的情况下，插入缓冲会占用过多的缓冲池内存，默认情况下最大可以占用1/2，这在实际应用中会带来一定的问题。
+
+#### 2. change buffer
+
+InnoDB从1.0.x版本开始引入了Change Buffer，可以将其视为Insert Buffer的升级。
+从这个版本开始，InnoDB可以对DML操作——Insert、Delete、Update都进行缓冲，
+它们分别是：Insert Buffer, Delete Buffer,Purge Buffer。
+
+对一个记录进行 update 操作有两个过程
+* 将记录标记为删除：delete buffer
+* 将记录真正删除：pruge buffer
+
+
+<table>
+<tr>
+    <th colspan="2">参数</th>
+    <th>InnoDB 版本</th>
+    <th colspan="3">作用</th>
+</tr>
+<tr>
+    <td colspan="2" style="text-align:center"><span id="innodb_change_buffering">innodb_change_buffering</span></td>
+    <td style="text-align:center"> 1.0.x开始 </td>
+    <td colspan="3">用来开启各种Buffer选项，默认值是all<br>
+        <ul>
+        <li>inserts</li>
+        <li>deletes</li>
+        <li>purges</li>
+        <li>changes：开启 inserts 和 deletes</li>
+        <li>all：都开启</li>
+        <li>none：都不开启</li>
+        </ul>
+    </td>
+</tr>
+<tr>
+    <td colspan="2" rowspan="2" style="text-align:center"><span id="innodb_change_buffer_max_size">innodb_change_buffer_max_size</span></td>
+    <td style="text-align:center"> 1.2.x开始 </td>
+    <td colspan="3">用来控制change buffer最大使用内存数量<br>默认值为25,表示最多使用1/4的缓存池空间<br>该参数最大有效值是50</td>
+</tr>
+</table>  
+
+### 两次写
+提高innodb的可靠性，用来解决部分写失败(partial page write页断裂)。
+
+#### 脏页刷新到磁盘风险
+
+关于IO的最小单位：
+
+　　1、数据库IO的最小单位是16K（MySQL默认，oracle是8K）
+
+　　2、文件系统IO的最小单位是4K（也有1K的）
+
+　　3、磁盘IO的最小单位是512字节
+
+因此，存在IO写入导致page损坏的风险：
+![IO风险](Mysql02/IO.png)
+
+
+提高innodb的可靠性，用来解决部分写失败(partial page write页断裂)。
+
+#### Double write解决了什么问题
+一个数据页的大小是16K，假设在把内存中的脏页写到数据库的时候，写了2K突然宕机了，也就是说前2K数据是新的，后14K是旧的，那么磁盘数据库这个数据页就是不完整的，是一个坏掉的数据页，这种情况被称为部分`写失效`
+
+**那么可不可以通过 redo log 来进行恢复呢？**
+redo只能恢复校验完整（还没写）的页，不能修复坏掉的数据页，所以这个数据就丢失了，可能会造成数据不一致，所以需要double write。
+
+{% note info %}   
+为什么 redo log 不需要 doublewrite 的支持？
+因为 redo log 写入的单位就是 512 字节，也就是磁盘 IO 的最小单位，所以无所谓数据损坏。
+{% endnote %}   
+
+#### 两次写工作流程
+![两次写流程](Mysql02/doublewrite.png)
+doublewrite由两部分组成，一部分为内存中的doublewrite buffer，其大小为2MB，另一部分是磁盘上共享表空间(ibdata x)中连续的128个页，即2个区(extent)，大小也是2M。
+1. 当一系列机制触发数据缓冲池中的脏页刷新时，并不直接写入磁盘数据文件中，而是先拷贝至内存中的doublewrite buffer中；
+2. 接着从两次写缓冲区分两次写入磁盘共享表空间中(连续存储，顺序写，性能很高)，每次写1MB；
+3. 待第二步完成后，再将doublewrite buffer中的脏页数据写入实际的各个表空间文件(离散写)；(脏页数据固化后，即进行标记对应doublewrite数据可覆盖)
+
+现在我们来分析一下为什么 double write 可以生效。当宕机发生时，有那么几种情况：
+1. 磁盘还未写，此时可以通过 redo log 恢复；
+2. 磁盘正在进行从内存到共享表空间的写，此时数据文件中的页还没开始被写入，因此也同样可以通过 redo log 恢复；
+3. 磁盘正在写数据文件，此时共享表空间已经写完，可以从共享表空间拷贝页的副本到数据文件实现恢复。
+
+### 自适应哈希索引
