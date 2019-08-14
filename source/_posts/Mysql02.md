@@ -43,7 +43,7 @@ Master Thread是最核心的一个后台线程，主要负责将缓冲池中的�
     <td colspan="4">4 个 io thread：write，read，insert buffer，log IO Thread.
     <ul>
         <li>在Linux下，IO Thread的数量不能进行调整</li>
-        <li>在Windows下可以通过参数 innodb_file_io_threads 来增大IO Thread=1</li>
+        <li>在Windows下可以通过参数 innodb_file_io_threads 来增大IO Thread</li>
     </ul>
     </td>
 </tr>
@@ -137,6 +137,7 @@ innoDB内存主要由[缓冲池(innodb buffer pool)](#缓冲池)、[重做日志
 
  
 #### 缓冲池管理方式
+![三种list](Mysql02/three-list.png)
  1. **LRU list** 
      **LRU算法**：最频繁使用页在LRU列表的前端，最少使用的页在尾端。首先释放LRU列表中的尾端的页。缓冲池中页的大小默认为16KB。
      **InnoDB优化的LRU算法(midpoint insertion strategy)**：将新读取到的页不放在首部，而是中间部位 `midpoint` 位置。目标是确保频繁访问"热"页面保留在缓冲池中。
@@ -178,7 +179,7 @@ innoDB内存主要由[缓冲池(innodb buffer pool)](#缓冲池)、[重做日志
  
  2. **Free list**
     当数据库刚启动时，LRU列表是空的，这时页都存放在Free list中。
-    当需要从缓冲池中分页时，从Free list中查找是否有可用的空闲页，若有则将该页从Free列表中删除，放入到LRU列表中。
+    当需要从缓冲池中分页时，从Free list中查找是否有可用的空闲页，若有则将该页从Free列表中删除，放入到LRU列表中,维持页数守恒。
  3. **Flush list**               
     在LRU类表的页被修改后，称为脏页（Dirty Page），即缓存和硬盘的页数据不一致。
     数据库会通过`CHECKPOINT`机制将脏页刷新回磁盘，Flush list中的页即为脏页列表。
@@ -224,8 +225,8 @@ innoDB内存主要由[缓冲池(innodb buffer pool)](#缓冲池)、[重做日志
 {% endnote %} 
 
 innodb 内部有两种 checkpoint：
-1. sharp checkpoint：数据库关闭的时候将所有的脏页刷回到磁盘，默认方式，参数 innodb_fast_shudown=1
-2. fuzzy checkpoint：只刷新部分脏页
+1. **sharp checkpoint**：数据库关闭的时候将`所有的脏页`刷回到磁盘，默认方式，参数 innodb_fast_shudown=1
+2. **fuzzy checkpoint**：只刷新`部分脏页`
     - master thread checkpoint：master thread 异步的以每秒或者每 10 秒的速度从缓冲池的脏页列表中刷新一定比列的也回磁盘
     - flush_lru_list checkpoint：InnoDB要保证LRU列表中需要有差不多100个空闲页可供使用。如果没有这么多，就会将 lru list 尾部的页移除。如果这些页有脏页，就需要进行 checkpoint。
          - innodb 1.1.x版本之前，检查在用户查询线程中,会阻塞用户查询操作。
@@ -454,7 +455,7 @@ srv_master_do_active_tasks();
 而对于`非聚集索引`来说，叶子节点的插入不再有序，这时就需要离散访问非聚集索引页，插入性能变低。
 因此引入插入缓冲机制。
 
-对于`非聚集索引（非唯一）`的插入和更新有效，对于插入或更新操作,不是每一次直接插入索引页。
+对于`非聚集索引（非唯一）`的插入和更新,不是每一次直接插入索引页。
 而是先判断插入的非聚集索引页是否在缓冲池中。
 如果在,则直接插入,如果不再,则先放入一个插入缓冲区中。
 然后再以一定的频率执行插入缓冲和非聚集索引页子节点的合并操作。
