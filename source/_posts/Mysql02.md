@@ -205,7 +205,7 @@ innoDB内存主要由[缓冲池(innodb buffer pool)](#缓冲池)、[重做日志
 ### 额外的内存池
    在InnoDB存储引擎中，对内存的管理是通过一种称为内存堆的方式进行的。在对一些数据结构本身的内存进行分配时，需要从额外的内存池中进行申请，当该区域的内存不够时，会从缓冲池中进行申请。
 
-## Checkpoint技术 
+# Checkpoint技术 
         
 {% note info %}    
    **什么是Checkpoint？**
@@ -232,10 +232,14 @@ innodb 内部有两种 checkpoint：
          - innodb 1.2.x版本之后，检查放到了单独的 page cleaner 线程中,可通过 **innodb_lru_scan_depth** 控制lru列表中可用页的数量，默认是1024。
     - async/sync flush checkpoint：重做日志文件不可用时，强制将一些页刷新到磁盘。达到重做日志文件的大小阈值。
     - dirty page too much checkpoint：当缓冲池中脏页的数量占据一定百分比时，强制进行Checkpoint，用来保证缓冲池中有足够的页，通过 [innodb_max_dirty_pages_pct](#innodb_max_dirty_pages_pct) 参数控制。
-                                             
-## Master thread 工作方式
+              
+<div style="text-align:center;color:#bfbfbf;font-size:16px;">
+    <span>-------- 第二部分 --------</span>
+</div>
+                               
+# Master thread 工作方式
 
-### InnoDB 1.0.x 版本之前的 Master thread
+## InnoDB 1.0.x 版本之前的 Master thread
 Master thread 内部有多个循环 loop 组成：
 * 主循环 loop
 * 后台循环 backgroup loop
@@ -311,7 +315,7 @@ void master_thread()
 }
 
 ```
-### InnoDB 1.2.x 版本之前的 Master thread
+## InnoDB 1.2.x 版本之前的 Master thread
 1. 提高刷新脏页数量和合并插入数量，改善磁盘 IO 处理能力,刷新数量不再硬编码，而是使用百分比控制。
     * 在合并插入缓冲的时候，合并插入缓冲的数量为 [innodb_io_capacity](#innodb_io_capacity) 的 5%
     * 在从缓冲区刷新脏页的时候，刷新脏页的数量为 [innodb_io_capacity](#innodb_io_capacity)
@@ -422,7 +426,7 @@ void master_thread()
 }
 
 ```
-### InnoDB 1.2.x 版本的 Master thread
+## InnoDB 1.2.x 版本的 Master thread
 
 InnoDB 1.2.x 版本中再次对 Master Thread 进行了优化，伪代码如下：
 ```java
@@ -435,11 +439,8 @@ srv_master_do_active_tasks();
 ```
 对于刷新脏页的操作，从Master Thread线程分离到一个单独的Page Cleaner Thread，从而减轻了Master Thread的工作，同时进一步提高了系统的并发性。
 
-<div style="text-align:center;color:#bfbfbf;font-size:16px;">
-    <span>-------- 第二部分 --------</span>
-</div>
 
-## InnoDB 关键特性
+# InnoDB 关键特性
 关键特性包括：
 * 插入缓冲 insert buffer
 * 两次写 double write
@@ -447,7 +448,7 @@ srv_master_do_active_tasks();
 * 异步 io async io
 * 刷新邻接页 flush neighbor page
 
-### 插入缓冲
+## 插入缓冲
 
 聚集索引(primary key)一般是顺序的，不需要磁盘的随机读取，插入效率高。
 而对于`非聚集索引`来说，叶子节点的插入不再有序，这时就需要离散访问非聚集索引页，插入性能变低。
@@ -460,7 +461,7 @@ srv_master_do_active_tasks();
 
 插入缓冲,不是缓冲池中的一个部分,而是**物理页**的一个组成部分。
 
-#### 1. insert buffer
+### 1. insert buffer
 Insert Buffer的使用流程：
 ![Insert Buffer的使用流程](Mysql02/Insert-Buffer.svg)
 
@@ -474,7 +475,7 @@ Insert Buffer的使用流程：
 1）可能导致数据库宕机后实例恢复时间变长。如果应用程序执行大量的插入和更新操作，且涉及非唯一的聚集索引，一旦出现宕机，这时就有大量内存中的插入缓冲区数据没有合并至索引页中，导致实例恢复时间会很长。
 2）在写密集的情况下，插入缓冲会占用过多的缓冲池内存，默认情况下最大可以占用1/2，这在实际应用中会带来一定的问题。
 
-#### 2. change buffer
+### 2. change buffer
 
 InnoDB从1.0.x版本开始引入了Change Buffer，可以将其视为Insert Buffer的升级。
 从这个版本开始，InnoDB可以对DML操作——Insert、Delete、Update都进行缓冲，
@@ -512,10 +513,10 @@ InnoDB从1.0.x版本开始引入了Change Buffer，可以将其视为Insert Buff
 </tr>
 </table>  
 
-### 两次写
+## 两次写
 提高innodb的可靠性，用来解决部分写失败(partial page write页断裂)。
 
-#### 脏页刷新到磁盘风险
+### 脏页刷新到磁盘风险
 
 关于IO的最小单位：
 
@@ -531,7 +532,7 @@ InnoDB从1.0.x版本开始引入了Change Buffer，可以将其视为Insert Buff
 
 提高innodb的可靠性，用来解决部分写失败(partial page write页断裂)。
 
-#### Double write解决了什么问题
+### Double write解决了什么问题
 一个数据页的大小是16K，假设在把内存中的脏页写到数据库的时候，写了2K突然宕机了，也就是说前2K数据是新的，后14K是旧的，那么磁盘数据库这个数据页就是不完整的，是一个坏掉的数据页，这种情况被称为部分`写失效`
 
 **那么可不可以通过 redo log 来进行恢复呢？**
@@ -542,7 +543,7 @@ redo只能恢复校验完整（还没写）的页，不能修复坏掉的数据�
 因为 redo log 写入的单位就是 512 字节，也就是磁盘 IO 的最小单位，所以无所谓数据损坏。
 {% endnote %}   
 
-#### 两次写工作流程
+### 两次写工作流程
 ![两次写流程](Mysql02/doublewrite.png)
 doublewrite由两部分组成，一部分为内存中的doublewrite buffer，其大小为2MB，另一部分是磁盘上共享表空间(ibdata x)中连续的128个页，即2个区(extent)，大小也是2M。
 1. 当一系列机制触发数据缓冲池中的脏页刷新时，并不直接写入磁盘数据文件中，而是先拷贝至内存中的doublewrite buffer中；
@@ -554,4 +555,48 @@ doublewrite由两部分组成，一部分为内存中的doublewrite buffer，其
 2. 磁盘正在进行从内存到共享表空间的写，此时数据文件中的页还没开始被写入，因此也同样可以通过 redo log 恢复；
 3. 磁盘正在写数据文件，此时共享表空间已经写完，可以从共享表空间拷贝页的副本到数据文件实现恢复。
 
-### 自适应哈希索引
+## 自适应哈希索引
+
+哈希：一次就可以定位数据
+
+B+树：取决于树的高度，生产环境一般是 3-4 层，所以需要查询 3-4 次
+
+自适应哈希索引 AHI（adaptive hash index）建立条件：观察到一个访问模式访问频繁，就会建立哈希索引
+* 通过该模式访问了 100 次（模式：where x = ?）
+* 页通过该模式访问了 N 次，其中 N = 页的记录总数⁄16
+
+InnoDB 存储引擎官方文档显示，启用 AHI 后,读取和写入速度可以提高 2 倍，辅助索引的连接操作性能可以提高 5 倍。
+
+## 异步IO
+为了提高磁盘的操作性能，当前的数据库系统都采用异步IO的方式处理磁盘操作。用户可以在发出一个IO请求胡立即再发出另一个IO请求，当全部IO请求发送完毕后，等待所有IO操作完成，这就是AIO。
+AIO的另一个优势是可以进行IO Merge操作，也就是将多个IO合并为1个IO, 这样可以提高IOPS(Input/Output Per Second)的性能。
+
+例如：用户访问页的（space, page_no)为(8,6) (8,7) (8,8)，每个页的大小为16KB，同步IO需要3次IO操作。可以优化为从(8,6)开始读取48KB。
+
+## 刷新临接页
+
+当刷新一个脏页时，InnoDB会检查该页所在extent的所有页，如果是脏页，一起刷新。
+
+<table>
+    <tr>
+        <th colspan="2">参数</th>
+        <th>版本</th>
+        <th colspan="3">作用</th>
+    </tr>
+    <tr>
+        <th colspan="2" style="text-align:center" >innodb_flush_neighbors</th>
+        <td style="text-align:center">1.2.x开始</td>
+        <td colspan="3">控制是否启用该特性</td>
+    </tr>
+</table> 
+
+
+# 参考：
+* http://oohcode.com/2015/10/14/InnoDB-Key-Features/
+* https://chyroc.cn/posts/innodb-storage-engine-reading-1/
+* https://www.cnblogs.com/zhoujinyi/archive/2013/04/11/2988923.html
+* http://huzb.me/2019/01/14/%E6%8F%92%E5%85%A5%E7%BC%93%E5%86%B2%E3%80%81%E4%B8%A4%E6%AC%A1%E5%86%99%E5%92%8C%E8%87%AA%E9%80%82%E5%BA%94%E5%93%88%E5%B8%8C%E7%B4%A2%E5%BC%95/
+* https://blog.csdn.net/tanliqing2010/article/details/81509539
+* https://www.cnblogs.com/geaozhang/p/7341333.html
+* https://draveness.me/mysql-innodb
+* https://www.docs4dev.com/docs/zh/mysql/5.7/reference/innodb-architecture.html#innodb%E6%9E%B6%E6%9E%84
