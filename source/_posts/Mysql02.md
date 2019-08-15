@@ -18,7 +18,7 @@ date: 2019-07-31 11:34:00
 <!-- more -->
 
 # 体系架构
-![innoDB体系结构图](Mysql02/1.png)
+![innoDB体系结构图](Mysql02/innodb-Architecture.png)
 InnoDB存储引擎是由内存池、后台线程、磁盘存储三大部分组成。
 
 ## 线程
@@ -92,7 +92,6 @@ Page Cleaner Thread的作用是取代Master Thread中脏页刷新的操作，
 减轻原Master Thread的工作及对于用户查询线程的阻塞，进一步提高性能。
 
 ## 内存
-![innoDB内存的结构](Mysql02/2.png)
 
 innoDB内存主要由[缓冲池(innodb buffer pool)](#缓冲池)、[重做日志缓冲(redo log buffer)](#重做日志缓冲)、[额外内存池组成(innodb additional men pool size)](#额外的内存池)组成
 
