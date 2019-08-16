@@ -2,6 +2,7 @@ title: InnoDB存储引擎
 tags:
   - 学习笔记
   - MySql
+  - InnoDB
 categories:
   - Mysql
 author: Guyuqing
@@ -98,15 +99,10 @@ innoDB内存主要由[缓冲池(innodb buffer pool)](#缓冲池)、[重做日志
 ### 缓冲池
 缓冲池是主存储器中的一个区域，用于在访问时缓存表和索引数据。缓冲池允许直接从内存处理常用数据，从而加快处理速度。
 在专用服务器上，通常会将最多80％的物理内存分配给缓冲池。
-* **读** 
-    * 将从磁盘读到的页存放在缓冲池中 也称将页**fix**在缓冲池中
-    * 下一次读相同的页的时候，判断是不是在缓冲池里面 ？直接读该页 ：读磁盘
-    * ![流程图](Mysql02/read.svg)
-* **写**
-    * 修改缓冲池中的页
-    * 以一定的频率刷新到磁盘
-    * 不是每次数据修改都刷新，而是通过[`Checkpoint`](#Checkpoint技术)机制刷新会磁盘
-    * ![流程图](Mysql02/write.svg)
+读取流程：
+     ![流程图](Mysql02/read.png)
+更新流程：
+     ![流程图](Mysql02/write.png)
 
 因此缓冲池的大小影响数据库的整体性能。
 {% note info %}
@@ -136,8 +132,12 @@ innoDB内存主要由[缓冲池(innodb buffer pool)](#缓冲池)、[重做日志
 
  
 #### 缓冲池管理方式
-![三种list](Mysql02/three-list.png)
- 1. **LRU list** 
+![三种list](Mysql02/three-list2.png)
+ 1. **Free list**
+    当数据库刚启动时，LRU列表是空的，这时页都存放在Free list中。
+    当需要从缓冲池中分页时，从Free list中查找是否有可用的空闲页，若有则将该页从Free列表中删除，放入到LRU列表中,维持页数守恒。
+
+ 2. **LRU list** 
      **LRU算法**：最频繁使用页在LRU列表的前端，最少使用的页在尾端。首先释放LRU列表中的尾端的页。缓冲池中页的大小默认为16KB。
      **InnoDB优化的LRU算法(midpoint insertion strategy)**：将新读取到的页不放在首部，而是中间部位 `midpoint` 位置。目标是确保频繁访问"热"页面保留在缓冲池中。
      ![lru](Mysql02/innodb-buffer-pool-list.jpg)
@@ -176,10 +176,7 @@ innoDB内存主要由[缓冲池(innodb buffer pool)](#缓冲池)、[重做日志
  因为某些SQL操作会访问很多页，甚至全部页，但仅仅在该次查询操作，并不是活跃的热点数据。可能会使缓冲池中的页被刷新出，从而影响缓冲池的效率。
  {% endnote %}  
  
- 2. **Free list**
-    当数据库刚启动时，LRU列表是空的，这时页都存放在Free list中。
-    当需要从缓冲池中分页时，从Free list中查找是否有可用的空闲页，若有则将该页从Free列表中删除，放入到LRU列表中,维持页数守恒。
- 3. **Flush list**               
+  3. **Flush list**               
     在LRU类表的页被修改后，称为脏页（Dirty Page），即缓存和硬盘的页数据不一致。
     数据库会通过`CHECKPOINT`机制将脏页刷新回磁盘，Flush list中的页即为脏页列表。
 
