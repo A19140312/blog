@@ -228,6 +228,16 @@ innodb 内部有两种 checkpoint：
          - innodb 1.1.x版本之前，检查在用户查询线程中,会阻塞用户查询操作。
          - innodb 1.2.x版本之后，检查放到了单独的 page cleaner 线程中,可通过 **innodb_lru_scan_depth** 控制lru列表中可用页的数量，默认是1024。
     - async/sync flush checkpoint：重做日志文件不可用时，强制将一些页刷新到磁盘。达到重做日志文件的大小阈值。
+         * checkpoint age = redo_lsn - cp_lsn
+          	低水位 = 75% * 总redo大小
+          	高水位 = 90% * 总redo大小
+         * 低水位  >=  checkpoint age
+          	不需要刷新
+         * 低水位  <=  checkpoint age <= 高水位
+          	会强制进行 checkpoint ， 根据flush_list的顺序，刷新足够多的脏页，让checkpoint age 小于低水位线   
+         * 高水位  >=  checkpoint age
+          	会强制进行 checkpoint ， 根据flush_list的顺序，刷新脏页, 让其满足 低水位  <=  checkpoint age >= 高水位
+    
     - dirty page too much checkpoint：当缓冲池中脏页的数量占据一定百分比时，强制进行Checkpoint，用来保证缓冲池中有足够的页，通过 [innodb_max_dirty_pages_pct](#innodb_max_dirty_pages_pct) 参数控制。
               
 <div style="text-align:center;color:#bfbfbf;font-size:16px;">
