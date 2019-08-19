@@ -1,4 +1,4 @@
-title: Redo与Undo
+title: 《Mysql技术内幕》学习笔记-Redo与Undo
 tags:
   - 学习笔记
   - MySql

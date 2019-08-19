@@ -1,5 +1,5 @@
 ---
-title: MySql体系结构和存储引擎
+title: 《Mysql技术内幕》学习笔记-MySql体系结构和存储引擎
 date: 2019-07-30 02:40:04
 tags:
     - MySql

@@ -1,4 +1,4 @@
-title: InnoDB存储引擎
+title: 《Mysql技术内幕》学习笔记-InnoDB存储引擎
 tags:
   - 学习笔记
   - MySql
@@ -608,4 +608,6 @@ AIO的另一个优势是可以进行IO Merge操作，也就是将多个IO合并�
 * https://blog.csdn.net/tanliqing2010/article/details/81509539
 * https://www.cnblogs.com/geaozhang/p/7341333.html
 * https://draveness.me/mysql-innodb
+* http://richfisher.me/blog/2017/12/18/innodb-notes/
 * https://www.docs4dev.com/docs/zh/mysql/5.7/reference/innodb-architecture.html#innodb%E6%9E%B6%E6%9E%84
+* MySQL技术内幕：InnoDB存储引擎(第2版)

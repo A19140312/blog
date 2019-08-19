@@ -1,4 +1,4 @@
-title: LSN
+title: 《Mysql技术内幕》学习笔记-LSN
 tags:
   - 学习笔记
   - MySql
