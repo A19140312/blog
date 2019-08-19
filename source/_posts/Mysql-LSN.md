@@ -19,14 +19,9 @@ LOG
 Log sequence number 15151135824   -- redo log buffer 的 lsn，存放在redo log buffer 中称： redo_mem_lsn
 Log flushed up to   15151135824   -- redo log file 的 lsn，存放在redo log 中称： redo_log_lsn
 Pages flushed up to 15151135824   -- 最后一个刷到磁盘上的页的最新的 lsn  
-Last checkpoint at  15151135815   -- 最后一个刷到磁盘上的页的 checkpoint 所在的 lsn, 存放在redo log第一个文件的头部，称： cp_lsn
+Last checkpoint at  15151135815   -- 共享表空间上的日志记录点，最后一次检查点，及崩溃恢复时指定的起点 , checkpoint 所在的 lsn, 存放在redo log第一个文件的头部，称： cp_lsn
 ```
-
-目前看下来lsn有四个含义 
-1. redo_mem_lsn
-2. redo_log_lsn
-3. cp_lsn
-4. page_lsn : 每个page里面头部都会记录一个lsn，表示该page最后一次被修改的redo log lsn  
+![log](Mysql-LSN/LOG.png)
 
 # LSN 有什么用？
 主要用于MySQL重启恢复  
