@@ -52,6 +52,36 @@ SELECT @@global.read_buffer_size;
 这种修改，并不最终修改配置文件my.cnf的参数值，所以重新启动后，参数还是按照配置文件中的加载。
 
 # 日志文件
+MySQL中常见的日志文件有：
+* 错误日志（error log）：对MySQL的启动、运行、关闭过程进行记录错误信息、警告信息。
+* 慢查询日志（slow query log）
+* 二进制日志（bin log）
+* 查询日志（log）
+
+ ## 慢查询日志
+ 在MySQL启动时设一个阈值，将运行时间超过该值的所有SQL语句都记录到慢查询日志文件中。
+ <table>
+     <tr>
+         <th colspan="2">参数</th>
+         <th colspan="3">作用</th>
+     </tr>
+     <tr>
+         <th colspan="2" style="text-align:center" >set global log_slow_queries = on;</th>
+         <td colspan="3">开启慢查询命令，默认启动慢查询</td>
+     </tr>
+     <tr>
+         <th colspan="2" style="text-align:center" >set global long_query_time = 1;</th>
+         <td colspan="3">设置慢查询时间超过1s即被认为慢查询，默认10s</td>
+     </tr>
+     <tr>
+         <th colspan="2" style="text-align:center" >set global log_queries_not_using_indeces = on;</th>
+         <td colspan="3">如果SQL语句没有使用索引，会记录到慢查询中</td>
+     </tr>
+     <tr>
+         <th colspan="2" style="text-align:center" >set global log_throttle_queries_not_using_indexs = on;</th>
+         <td colspan="3">设置每分钟允许记录到slow log的且未使用索引的SQL语句次数，默认为0，表示没有限制。</td>
+     </tr>
+ </table> 
 
 # 套接字文件
 
@@ -64,3 +94,4 @@ SELECT @@global.read_buffer_size;
 # 参考
 * MySQL技术内幕：InnoDB存储引擎(第2版)
 * https://www.jianshu.com/p/c1ffd6956e6a
+* https://www.cnblogs.com/BlueMountain-HaggenDazs/p/9297883.html

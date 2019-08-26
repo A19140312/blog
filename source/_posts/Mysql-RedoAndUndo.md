@@ -50,6 +50,7 @@ undo log主要记录的是数据的逻辑变化，为了在发生错误时回滚
 
 ## undo 的整体流程
 ![undo](Mysql-RedoAndUndo/undo-Segment.png)
+undo log 采用顺序IO写入磁盘共享表空间。
 
 ## undo 类型
 * insert undo log：在insert 操作中产生的undo log，因为insert操作的记录，只对事务本身可见，对其他事务不可见。故该undo log可以在事务提交后直接删除，不需要进行purge操作。
@@ -126,6 +127,7 @@ redo log是物理日志，记录的是数据页的物理变化，显然undo log�
 
 <div style='display: none'>
 # 参考：
-https://keithlan.github.io/2017/06/12/innodb_locks_redo/
-https://juejin.im/post/5c3c5c0451882525487c498d
+* https://keithlan.github.io/2017/06/12/innodb_locks_redo/
+* https://juejin.im/post/5c3c5c0451882525487c498d
+* https://t.hao0.me/mysql/2016/11/05/mysql-innodb-05-tablespaces.html
 </div>
