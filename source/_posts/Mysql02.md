@@ -500,6 +500,12 @@ B+树的非叶子节点是Search key，构造结构为(space,marker,offset)。
 * Insert buffer bitmap page追踪到该索引页无可用空间时。
 * Master Thread。
 
+#### insert buffer 刷新到磁盘条件
+* 有一个后台线程，会认为数据库空闲时；
+* 数据库缓冲池不够用时；
+* 数据库正常关闭时；
+* redo log写满时：_几乎不会出现redo log写满，此时整个数据库处于无法写入的不可用状态_
+
 #### 插入缓冲主要带来如下两个坏处
 1）可能导致数据库宕机后实例恢复时间变长。如果应用程序执行大量的插入和更新操作，且涉及非唯一的聚集索引，一旦出现宕机，这时就有大量内存中的插入缓冲区数据没有合并至索引页中，导致实例恢复时间会很长。
 2）在写密集的情况下，插入缓冲会占用过多的缓冲池内存，默认情况下最大可以占用1/2，这在实际应用中会带来一定的问题。
@@ -507,9 +513,12 @@ B+树的非叶子节点是Search key，构造结构为(space,marker,offset)。
 ### 2. change buffer
 
 InnoDB从1.0.x版本开始引入了Change Buffer，可以将其视为Insert Buffer的升级。
-从这个版本开始，InnoDB可以对DML操作——Insert、Delete、Update都进行缓冲，
+从这个版本开始，InnoDB可以对DML操作——Insert、Delete、Update`(delete+insert)`都进行缓冲，
 它们分别是：Insert Buffer, Delete Buffer,Purge Buffer。
+对一个记录进行 update 操作有两个过程
 
+* 将记录标记为删除：delete buffer
+* 将记录真正删除：pruge buffer
 
 <table>
 <tr>
