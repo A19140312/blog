@@ -477,13 +477,30 @@ srv_master_do_active_tasks();
 Insert Buffer的使用流程：
 ![Insert Buffer的使用流程](Mysql02/Insert-Buffer.svg)
 
-插入缓冲的启用需要满足一下两个条件：
+#### 插入缓冲的启用需要满足以下两个条件：
 1）索引是辅助索引（secondary index）
-2）索引不适合唯一的
+2）索引不是唯一的：整个索引数据被切分为2部分，无法保证唯一性。
 
-如果辅助索引是唯一的，就不能使用该技术，原因很简单，因为如果这样做，整个索引数据被切分为2部分，无法保证唯一性。
+#### insert buffer结构
+insert buffer的数据结构是B+树，全局只有一颗B+树。
+B+树的非叶子节点是Search key，构造结构为(space,marker,offset)。
+* space：待插入记录所在表的表空间id。每个表都有唯一的表空间id，通过表空间id可以查出是哪张表。
+* marker：兼容之前的版本。
+* offset：在表空间中页的偏移量。
 
-插入缓冲主要带来如下两个坏处：
+当一个辅助索引要插入到(space,offset)中时，如果该页不在缓冲池中，则按上述规则构造一个search key，将该记录插入到insert buffer中。
+但是如果该页一直在insert buffer中，不断有记录插入到同一个索引页中，那么该索引页的空间就会逐渐缩小，要出现B+树节点的分裂情况，这时就不能进行insert buffer了。
+所以，我们需要一个机制来管理每个页面的剩余空闲空间，这就是`Insert buffer bitmap`。
+每隔page_size个页面，就是一个Insert buffer bitmap page。
+例如：若page_size = 16384(16k)，那么page_no为0，16384，32768，…的page，就是Insert buffer bitmap page，Bitmap page的功能，就是管理其后连续的page_size – 1个page的空间使用率。
+每个辅助索引页在Insert buffer bitmap中占用4bit。
+
+#### merge insert buffer 发生条件
+* 辅助索引页被读取到buffer pool中：正常的select查询操作，索引页被调入内存，该索引页对应在insert buffer中的索引更改记录就会发生merge操作。
+* Insert buffer bitmap page追踪到该索引页无可用空间时。
+* Master Thread。
+
+#### 插入缓冲主要带来如下两个坏处
 1）可能导致数据库宕机后实例恢复时间变长。如果应用程序执行大量的插入和更新操作，且涉及非唯一的聚集索引，一旦出现宕机，这时就有大量内存中的插入缓冲区数据没有合并至索引页中，导致实例恢复时间会很长。
 2）在写密集的情况下，插入缓冲会占用过多的缓冲池内存，默认情况下最大可以占用1/2，这在实际应用中会带来一定的问题。
 
