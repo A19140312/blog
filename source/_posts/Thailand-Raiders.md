@@ -123,4 +123,44 @@ end
 曼谷酒店位置：Ratchaprarop Road Ratchaprarop Road indraCondo/177/209 soi saengkran/ratchprarop road, Khet Ratchathewi, Krung Thep Maha Nakhon 10400, Thailand, Khet Ratchathewi, Krung Thep Maha Nakhon 10400, Thailand
 
 #### 9.15天津
-预约接机
+预约接机（提前两天预定）
+
+## 泰国必买
+BIG-C零食
+![](Thailand-Raiders/Screenshot_2019-08-31-11-46-03-072_com.xingin.xhs.png)
+![](Thailand-Raiders/Screenshot_2019-08-31-11-46-08-364_com.xingin.xhs.png)
+![](Thailand-Raiders/Screenshot_2019-08-31-11-46-00-652_com.xingin.xhs.png)
+![](Thailand-Raiders/Screenshot_2019-08-31-11-45-53-237_com.xingin.xhs.png)
+![](Thailand-Raiders/Screenshot_2019-08-31-11-45-57-687_com.xingin.xhs.png)
+711
+![](Thailand-Raiders/Screenshot_2019-08-31-12-05-14-972_com.xingin.xhs.png)
+![](Thailand-Raiders/Screenshot_2019-08-31-12-05-18-389_com.xingin.xhs.png)
+![](Thailand-Raiders/Screenshot_2019-08-31-12-05-20-912_com.xingin.xhs.png)
+![](Thailand-Raiders/Screenshot_2019-08-31-12-05-23-188_com.xingin.xhs.png)
+![](Thailand-Raiders/Screenshot_2019-08-31-12-05-25-297_com.xingin.xhs.png)
+![](Thailand-Raiders/Screenshot_2019-08-31-12-05-30-499_com.xingin.xhs.png)
+
+### 必买药品
+![](Thailand-Raiders/Screenshot_2019-08-31-13-11-50-782_com.xingin.xhs.png)
+![](Thailand-Raiders/Screenshot_2019-08-31-13-11-56-133_com.xingin.xhs.png)
+![](Thailand-Raiders/Screenshot_2019-08-31-13-12-27-105_com.xingin.xhs.png)
+
+### 必买化妆品
+欧莱雅唇膏、小黑瓶
+ONLY 小白瓶
+N7冰激凌面膜
+
+### 必逛
+华歌尔内衣Wacoal（曼谷尚泰商圈和暹罗挨着central world 三/四楼）
+Lee
+LeVI'S（暹罗广场，国内五折）
+everyandboy泰国本土美妆店
+日本松本清（central world 三楼）
+![](Thailand-Raiders/Screenshot_2019-08-31-14-05-58-003_com.xingin.xhs.png)
+
+## 泰国机场退税取货
+
+![](Thailand-Raiders/Screenshot_2019-08-31-14-25-04-833_com.xingin.xhs.png)
+
+
+
