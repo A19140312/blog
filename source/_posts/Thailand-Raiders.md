@@ -122,6 +122,10 @@ end
 ### 9.14曼谷
 曼谷酒店位置：Ratchaprarop Road Ratchaprarop Road indraCondo/177/209 soi saengkran/ratchprarop road, Khet Ratchathewi, Krung Thep Maha Nakhon 10400, Thailand, Khet Ratchathewi, Krung Thep Maha Nakhon 10400, Thailand
 
+![](Thailand-Raiders/WechatIMG38.jpeg)
+![](Thailand-Raiders/WechatIMG39.png)
+![](Thailand-Raiders/WechatIMG40.png)
+
 #### 9.15天津
 预约接机（提前两天预定）
 
