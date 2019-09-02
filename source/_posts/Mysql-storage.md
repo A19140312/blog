@@ -211,7 +211,7 @@ mysql> SELECT second_column(1);
 1 row in set (0.00 sec)
 ```
 
-## 查看和删除存储函数
+## 查看存储函数
 查看定义了多少个存储函数:
 ```sql
 SHOW FUNCTION STATUS [LIKE 需要匹配的函数名]
@@ -222,6 +222,7 @@ SHOW FUNCTION STATUS [LIKE 需要匹配的函数名]
 SHOW CREATE FUNCTION 函数名
 ```
 
+## 删除存储函数
 删除某个存储函数
 ```sql
 DROP FUNCTION 函数名
@@ -439,14 +440,195 @@ mysql> select sum_loop(10);
 1 row in set (0.00 sec)
 ```
 
+# 存储过程
+
+存储函数侧重于执行语句并返回一个值，而存储过程更侧重于单纯的去执行语句。
+## 创建存储过程
+```sql
+CREATE PROCEDURE 存储过程名称([参数列表])
+BEGIN
+    需要执行的语句
+END  
+```
+举个🌰：
+```sql
+mysql> CREATE PROCEDURE insert_first_table(c1 INT,c2 VARCHAR(100))
+    -> BEGIN
+    -> SELECT * FROM first_table;
+    -> INSERT INTO first_table(first_column,second_column) VALUES(c1,c2);
+    -> SELECT * FROM first_table;
+    -> END $
+Query OK, 0 rows affected (0.02 sec)
+```
+
+## 存储过程的调用
+存储函数执行语句并返回一个值，所以常用在表达式中。
+存储过程偏向于调用那些语句，并不能用在表达式中。
+我们需要显式的使用CALL语句来调用一个存储过程：
+
+```sql
+CALL 存储过程([参数列表]);
+```
+举个🌰：
+```sql
+mysql> CALL insert_first_table(4,'test');
+ 
++--------------+---------------+
+| first_column | second_column |
++--------------+---------------+
+|            1 | aaa           |
+|            2 | NULL          |
+|         NULL | ccc           |
++--------------+---------------+
+3 rows in set (0.00 sec)
 
 
++--------------+---------------+
+| first_column | second_column |
++--------------+---------------+
+|            1 | aaa           |
+|            2 | NULL          |
+|         NULL | ccc           |
+|            4 | test          |
++--------------+---------------+
+4 rows in set (0.00 sec)
+```
+
+## 查看存储过程
+```sql
+查看当前数据库中创建的存储过程都有哪些的语句：
+SHOW PROCEDURE STATUS [LIKE 需要匹配的函数名]
+
+查看某个存储过程定义的语句：
+SHOW CREATE PROCEDURE 存储过程名称
+```
+
+## 删除存储过程
+删除某个存储过程
+```sql
+DROP PROCEDURE 存储过程名称
+```
+
+## 存储过程参数类型
+<table>
+<tr>
+    <th>参数类型</th>
+    <th>实际参数是否必须是变量</th>
+    <th colspan="3">作用</th>
+</tr>
+<tr>
+    <td style="text-align:center">IN</td>
+    <td style="text-align:center">否</td>
+    <td colspan="3">用于调用者向过程传递数据，如果该参数在过程中被修改，调用者不可见</td>
+</tr>
+<tr>
+    <td style="text-align:center">OUT</td>
+    <td style="text-align:center">是</td>
+    <td colspan="3">用于把过程产生的结果放到此参数中，过程结束后调用者可以通过该参数来获取过程执行的结果</td>
+</tr>
+<tr>
+    <td style="text-align:center">INOUT</td>
+    <td style="text-align:center">是</td>
+    <td colspan="3">综合IN和OUT特点，即可用于调用者向过程传递数据，也可用于存放过程中产生的结果</td>
+</tr>
+</table>  
+
+### IN
+```sql
+mysql> CREATE PROCEDURE test_in(IN num INT)
+    -> BEGIN
+    -> SELECT num;
+    -> SET num = 666;
+    -> END $
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> SET @a = 111;
+
+Query OK, 0 rows affected (0.01 sec)
 
 
+mysql> CALL test_in(@a);
++------+
+| num  |
++------+
+|  111 |
++------+
+1 row in set (0.00 sec)
+
+Query OK, 0 rows affected (0.00 sec)
+```
+IN参数类型的变量只能用于读取，对类型的变量赋值是不会被调用者看到的。
+如果我们不写明参数类型的话，该参数的类型默认是IN。
+
+### OUT
+```sql
+mysql> CREATE PROCEDURE test_out(OUT num INT)
+    -> BEGIN
+    -> SELECT num;
+    -> SET num = 666;
+    -> END $
+Query OK, 0 rows affected (0.01 sec)
 
 
+mysql> CALL test_out(@a);
++------+
+| num  |
++------+
+| NULL |
++------+
+1 row in set (0.00 sec)
 
+Query OK, 0 rows affected (0.00 sec)
 
+mysql> SELECT @a;
++------+
+| @a   |
++------+
+|  666 |
++------+
+1 row in set (0.00 sec)
+
+```
+
+OUT参数类型的变量只能用于赋值，对类型的变量赋值是会被调用者看到的,因此参数就不允许是常量。
+
+存储过程中向调用者返回多个值，举个例子：
+```sql
+mysql> CREATE PROCEDURE data_out(OUT a INT,OUT b INT)
+    -> BEGIN
+    -> SET a = 100;
+    -> SET b = 200;
+    -> END $
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> CALL data_out(@a,@b);
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> select @a,@b;
++------+------+
+| @a   | @b   |
++------+------+
+|  100 |  200 |
++------+------+
+1 row in set (0.00 sec)
+
+```
+
+### INOUT
+
+这种类型的参数既可以在存储过程中被读取，也可以被赋值后被调用者看到，因此参数就不允许是常量。
+
+## 存储过程和函数的区别
+
+* 存储函数在定义时需要显式用RETURNS语句标明返回的数据类型，而且在函数体中必须使用RETURN语句来显式指定返回的值，存储过程不需要。
+
+* 存储函数的参数类型只能是IN，而存储过程支持IN、OUT、INOUT三种参数类型。
+
+* 存储函数只能返回一个值，而存储过程可以通过设置多个OUT类型的参数来返回多个结果。
+
+* 存储函数执行过程中产生的结果集并不会被显示到客户端，而存储过程执行过程中产生的结果集会被显示到客户端。
+
+* 存储函数的调用直接使用在表达式中，而存储过程只能通过CALL语句来显式调用。
 
 
 # 错误解决
