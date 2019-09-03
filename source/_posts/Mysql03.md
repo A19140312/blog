@@ -58,30 +58,31 @@ MySQL中常见的日志文件有：
 * 二进制日志（bin log）
 * 查询日志（log）
 
- ## 慢查询日志
- 在MySQL启动时设一个阈值，将运行时间超过该值的所有SQL语句都记录到慢查询日志文件中。
- <table>
+## 慢查询日志
+在MySQL启动时设一个阈值，将运行时间超过该值的所有SQL语句都记录到慢查询日志文件中。
+
+<table>
      <tr>
-         <th colspan="2">参数</th>
-         <th colspan="3">作用</th>
+         <th colspan="4">参数</th>
+         <th colspan="4">作用</th>
      </tr>
      <tr>
-         <th colspan="2" style="text-align:center" >set global log_slow_queries = on;</th>
-         <td colspan="3">开启慢查询命令，默认启动慢查询</td>
+         <th colspan="4">set global log_slow_queries = on;</th>
+         <td colspan="4">开启慢查询命令，默认启动慢查询</td>
      </tr>
      <tr>
-         <th colspan="2" style="text-align:center" >set global long_query_time = 1;</th>
-         <td colspan="3">设置慢查询时间超过1s即被认为慢查询，默认10s</td>
+         <th colspan="4" >set global long_query_time = 1;</th>
+         <td colspan="4">设置慢查询时间超过1s即被认为慢查询，默认10s</td>
      </tr>
      <tr>
-         <th colspan="2" style="text-align:center" >set global log_queries_not_using_indeces = on;</th>
-         <td colspan="3">如果SQL语句没有使用索引，会记录到慢查询中</td>
+         <th colspan="4">set global log_queries_not_using_indeces = on;</th>
+         <td colspan="4">如果SQL语句没有使用索引，会记录到慢查询中</td>
      </tr>
      <tr>
-         <th colspan="2" style="text-align:center" >set global log_throttle_queries_not_using_indexs = on;</th>
-         <td colspan="3">设置每分钟允许记录到slow log的且未使用索引的SQL语句次数，默认为0，表示没有限制。</td>
+         <th colspan="4">set global log_throttle_queries_not_using_indexs = on;</th>
+         <td colspan="4">设置每分钟允许记录到slow log的且未使用索引的SQL语句次数，默认为0，表示没有限制。</td>
      </tr>
- </table> 
+</table> 
 
 # 套接字文件
 
