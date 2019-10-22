@@ -80,6 +80,7 @@ comments: false
 * maximumPoolSize 最大线程数量；
 * keepAliveTime 线程池维护线程所允许的空闲时间。当线程池中的线程数量大于corePoolSize的时候，如果这时没有新的任务提交，核心线程外的线程不会立即销毁，而是会等待，直到等待的时间超过了keepAliveTime；
 * workQueue 保存等待执行的任务的阻塞队列，当提交一个新的任务到线程池以后, 线程池会根据当前线程池中正在运行着的线程的数量来决定对该任务的处理方式，主要有以下几种处理方式:
+  * **直接切换**：这种方式常用的队列是SynchronousQueue
   * **使用无界队列**：一般使用基于链表的阻塞队列LinkedBlockingQueue。如果使用这种方式，那么线程池中能够创建的最大线程数就是corePoolSize，而maximumPoolSize就不会起作用了。当线程池中所有的核心线程都是RUNNING状态时，这时一个新的任务提交就会放入等待队列中。
   * **使用有界队列**：一般使用ArrayBlockingQueue。使用该方式可以将线程池的最大线程数量限制为maximumPoolSize，这样能够降低资源的消耗，但同时这种方式也使得线程池对线程的调度变得更困难，因为线程池和队列的容量都是有限的值，所以要想使线程池处理任务的吞吐率达到一个相对合理的范围，又想使线程调度相对简单，并且还要尽可能的降低线程池对资源的消耗，就需要合理的设置这两个数量。
 * threadFactory 它是ThreadFactory类型的变量，用来创建新线程。默认使用Executors.defaultThreadFactory() 来创建线程。使用默认的ThreadFactory来创建线程时，会使新创建的线程具有相同的NORM_PRIORITY优先级并且是非守护线程，同时也设置了线程的名称。
@@ -417,7 +418,7 @@ Worker类投机取巧的继承了AbstractQueuedSynchronizer来简化在执行任
 ```
 #### getTask 方法
 
-runWorker函数中最重要的是getTask()，不断的从阻塞队列中取任务交给线程执行
+runWorker函数中最重要的是getTask()，不断的从阻塞队列中取任务交给线程执行，并且负责线程回收
 
 ```java
     private Runnable getTask() {
@@ -456,6 +457,7 @@ runWorker函数中最重要的是getTask()，不断的从阻塞队列中取任�
             }
 
             try {
+                //**保证核心线程不被销毁**
                 // 根据timed来判断，如果为true，则通过阻塞队列的poll方法进行超时控制，如果在keepAliveTime时间内没有获取到任务，则返回null；
                 // 否则通过take方法，如果这时队列为空，则take方法会阻塞直到队列不为空。
                 Runnable r = timed ?
@@ -473,4 +475,448 @@ runWorker函数中最重要的是getTask()，不断的从阻塞队列中取任�
         }
     }
 ```
+### FutureTask源码
+
+```java
+
+public class FutureTask<V> implements RunnableFuture<V> {
+
+    /**
+     * state字段用来保存FutureTask内部的任务执行状态，一共有7中状态，每种状态及其对应的值如下
+     * NEW:表示是个新的任务或者还没被执行完的任务。这是初始状态。
+     * COMPLETING:任务已经执行完成或者执行任务的时候发生异常，但是任务执行结果或者异常原因还没有保存到outcome字段(outcome字段用来保存任务执行结果，如果发生异常，则用来保存异常原因)的时候，状态会从NEW变更到COMPLETING。但是这个状态会时间会比较短，属于中间状态。
+     * NORMAL:任务已经执行完成并且任务执行结果已经保存到outcome字段，状态会从COMPLETING转换到NORMAL。这是一个最终态。
+     * EXCEPTIONAL:任务执行发生异常并且异常原因已经保存到outcome字段中后，状态会从COMPLETING转换到EXCEPTIONAL。这是一个最终态。
+     * CANCELLED:任务还没开始执行或者已经开始执行但是还没有执行完成的时候，用户调用了cancel(false)方法取消任务且不中断任务执行线程，这个时候状态会从NEW转化为CANCELLED状态。这是一个最终态。
+     * INTERRUPTING: 任务还没开始执行或者已经执行但是还没有执行完成的时候，用户调用了cancel(true)方法取消任务并且要中断任务执行线程但是还没有中断任务执行线程之前，状态会从NEW转化为INTERRUPTING。这是一个中间状态。
+     * INTERRUPTED:调用interrupt()中断任务执行线程之后状态会从INTERRUPTING转换到INTERRUPTED。这是一个最终态。
+     * 
+     * NEW -> COMPLETING -> NORMAL 正常执行并返回
+     * NEW -> COMPLETING -> EXCEPTIONAL 执行过程中出现了异常
+     * NEW -> CANCELLED 执行前被取消
+     * NEW -> INTERRUPTING -> INTERRUPTED 取消时被中断
+     */
+    private volatile int state;
+    private static final int NEW          = 0;
+    private static final int COMPLETING   = 1;//大于这个值就是完成状态
+    private static final int NORMAL       = 2;
+    private static final int EXCEPTIONAL  = 3;
+    private static final int CANCELLED    = 4;
+    private static final int INTERRUPTING = 5;
+    private static final int INTERRUPTED  = 6;
+
+    /** The underlying callable; nulled out after running */
+    private Callable<V> callable;
+    /** The result to return or exception to throw from get() */
+    private Object outcome; // non-volatile, protected by state reads/writes
+    /** 执行callable的线程 **/
+    private volatile Thread runner;
+    /** 使用Treiber算法实现的无阻塞的Stack，用于存放等待的线程 */
+    private volatile WaitNode waiters;
+
+    @SuppressWarnings("unchecked")
+    private V report(int s) throws ExecutionException {
+        // 拿到返回结果
+        Object x = outcome;
+        // 判断状态
+        if (s == NORMAL)
+            // 状态正常，就返回结果值
+            return (V)x;
+        // 判断异常，就抛出异常。
+        if (s >= CANCELLED)
+            throw new CancellationException();
+        throw new ExecutionException((Throwable)x);
+    }
+
+    /**
+     * 构造方法
+     */
+    public FutureTask(Callable<V> callable) {
+        if (callable == null)
+            throw new NullPointerException();
+        this.callable = callable;
+        this.state = NEW;       // ensure visibility of callable
+    }
+
+    /**
+     * 这个构造方法会把传入的Runnable封装成一个Callable对象保存在callable字段中，同时如果任务执行成功的话就会返回传入的result。
+     * 这种情况下如果不需要返回值的话可以传入一个null。
+     */
+    public FutureTask(Runnable runnable, V result) {
+        this.callable = Executors.callable(runnable, result);
+        this.state = NEW;       // ensure visibility of callable
+    }
+
+    //判断任务是否被取消
+    public boolean isCancelled() {
+        return state >= CANCELLED;
+    }
+    //判断任务是否完成
+    public boolean isDone() {
+        return state != NEW;
+    }
+
+    public boolean cancel(boolean mayInterruptIfRunning) {
+        // 1. 任务是new状态 并且 根据mayInterruptIfRunning把状态从NEW转化到INTERRUPTING或CANCELLED 
+        // 不符合上述状态，返回false
+        if (!(state == NEW &&
+              UNSAFE.compareAndSwapInt(this, stateOffset, NEW,
+                  mayInterruptIfRunning ? INTERRUPTING : CANCELLED)))
+            return false;
+        try {    
+        // 2. 如果需要中断任务执行线程
+            if (mayInterruptIfRunning) {
+                try {
+                    // runner保存着当前执行任务的线程
+                    Thread t = runner;
+                    if (t != null)
+                        //中断任务执行线程
+                        t.interrupt();
+                } finally { // final state
+                    // 修改状态为INTERRUPTED
+                    UNSAFE.putOrderedInt(this, stateOffset, INTERRUPTED);
+                }
+            }
+        } finally {
+            finishCompletion();
+        }
+        return true;
+    }
+
+
+    public V get() throws InterruptedException, ExecutionException {
+        int s = state;
+        // 判断任务当前的state <= COMPLETING是否成立。
+        if (s <= COMPLETING)
+            // 如果成立，表明任务还没有结束(这里的结束包括任务正常执行完毕，任务执行异常，任务被取消)
+            // 调用awaitDone()进行阻塞等待。
+            s = awaitDone(false, 0L);
+        // 任务已经结束，调用report()返回结果。
+        return report(s);
+    }
+
+
+    public V get(long timeout, TimeUnit unit)
+        throws InterruptedException, ExecutionException, TimeoutException {
+        if (unit == null)
+            throw new NullPointerException();
+        int s = state;
+        // 如果awaitDone()超时返回之后任务还没结束，则抛出异常
+        if (s <= COMPLETING &&
+            (s = awaitDone(true, unit.toNanos(timeout))) <= COMPLETING)
+            throw new TimeoutException();
+        return report(s);
+    }
+
+
+    protected void done() { }
+
+
+    protected void set(V v) {
+        // 尝试CAS操作，把当前的状态从NEW变更为COMPLETING(中间状态)状态。
+        if (UNSAFE.compareAndSwapInt(this, stateOffset, NEW, COMPLETING)) {
+            // 把任务执行结果保存在outcome字段中。
+            outcome = v;
+            // CAS的把当前任务状态从COMPLETING变更为NORMAL
+            UNSAFE.putOrderedInt(this, stateOffset, NORMAL); // final state
+            finishCompletion();
+        }
+    }
+
+
+    protected void setException(Throwable t) {
+        // 尝试CAS操作，把当前的状态从NEW变更为COMPLETING(中间状态)状态。
+        if (UNSAFE.compareAndSwapInt(this, stateOffset, NEW, COMPLETING)) {
+            // 把异常原因保存在outcome字段中，outcome字段用来保存任务执行结果或者异常原因。
+            outcome = t;
+            // CAS的把当前任务状态从COMPLETING变更为EXCEPTIONAL。
+            UNSAFE.putOrderedInt(this, stateOffset, EXCEPTIONAL); // final state
+            finishCompletion();
+        }
+    }
+
+
+    public void run() {
+        // 状态如果不是NEW，说明任务或者已经执行过，或者已经被取消，直接返回
+        // 状态如果是NEW，则尝试把当前执行线程保存在runner字段(runnerOffset)中，如果赋值失败则直接返回
+        if (state != NEW ||
+            !UNSAFE.compareAndSwapObject(this, runnerOffset,
+                                         null, Thread.currentThread()))
+            return;
+        try {
+            Callable<V> c = callable;
+            // 只有初始状态才会执行
+            if (c != null && state == NEW) {
+                V result;
+                boolean ran;
+                try {
+                    // 执行任务  计算逻辑
+                    result = c.call();
+                    ran = true;
+                } catch (Throwable ex) {
+                    result = null;
+                    ran = false;
+                    // 保存异常
+                    setException(ex);
+                }
+                if (ran)
+                    // 任务执行成功，保存返回结果
+                    set(result);
+            }
+        } finally {
+            // 无论是否执行成功，把runner设置为null
+            runner = null;
+            // state must be re-read after nulling runner to prevent
+            // leaked interrupts
+            int s = state;
+            // 如果任务被中断，执行中断处理
+            if (s >= INTERRUPTING)
+                handlePossibleCancellationInterrupt(s);
+        }
+    }
+
+    /**
+     * 与run方法类似，区别在于这个方法不会设置任务的执行结果值
+     *
+     * @return {@code true} if successfully run and reset
+     */
+    protected boolean runAndReset() {
+        if (state != NEW ||
+            !UNSAFE.compareAndSwapObject(this, runnerOffset,
+                                         null, Thread.currentThread()))
+            return false;
+        boolean ran = false;
+        int s = state;
+        try {
+            Callable<V> c = callable;
+            if (c != null && s == NEW) {
+                try {
+                    // 不获取和设置返回值
+                    c.call(); // don't set result
+                    ran = true;
+                } catch (Throwable ex) {
+                    setException(ex);
+                }
+            }
+        } finally {
+
+            runner = null;
+            s = state;
+            if (s >= INTERRUPTING)
+                handlePossibleCancellationInterrupt(s);
+        }
+        // 是否正确的执行并复位
+        return ran && s == NEW;
+    }
+
+
+    private void handlePossibleCancellationInterrupt(int s) {
+        if (s == INTERRUPTING)
+            while (state == INTERRUPTING)
+                Thread.yield(); // wait out pending interrupt
+
+        // 确保cancel(true)产生的中断发生在run或runAndReset方法执行的过程中。
+        //这里会循环的调用Thread.yield()来确保状态在cancel方法中被设置为INTERRUPTED。
+    }
+
+    /**
+     * Simple linked list nodes to record waiting threads in a Treiber
+     * stack.  See other classes such as Phaser and SynchronousQueue
+     * for more detailed explanation.
+     */
+    static final class WaitNode {
+        volatile Thread thread;
+        volatile WaitNode next;
+        WaitNode() { thread = Thread.currentThread(); }
+    }
+
+    /**
+     * Removes and signals all waiting threads, invokes done(), and
+     * nulls out callable.
+     */
+    private void finishCompletion() {
+        // assert state > COMPLETING;
+        // 执行该方法时state必须大于COMPLETING
+        // 依次遍历waiters链表
+        for (WaitNode q; (q = waiters) != null;) {
+            // 设置栈顶节点为null
+            if (UNSAFE.compareAndSwapObject(this, waitersOffset, q, null)) {
+                for (;;) {
+                    Thread t = q.thread;
+                    if (t != null) {
+                        q.thread = null;
+                        // 唤醒等待线程
+                        LockSupport.unpark(t);
+                    }
+                    WaitNode next = q.next;
+                    // 如果next为空，说明栈空了，跳出循环
+                    if (next == null)
+                        break;
+                    // 方便gc回收
+                    q.next = null; 
+                    // 重新设置栈顶node
+                    q = next;
+                }
+                break;
+            }
+        }
+        // 空方法，留给子类扩展
+        done();
+
+        callable = null;        // to reduce footprint
+    }
+
+    /**
+     * Awaits completion or aborts on interrupt or timeout.
+     *
+     * @param timed true if use timed waits
+     * @param nanos time to wait, if timed
+     * @return state upon completion
+     */
+    private int awaitDone(boolean timed, long nanos)
+        throws InterruptedException {
+        // 计算等待截止时间
+        final long deadline = timed ? System.nanoTime() + nanos : 0L;
+        WaitNode q = null;
+        boolean queued = false;
+        for (;;) {
+            // 1. 判断阻塞线程是否被中断
+            if (Thread.interrupted()) {
+                // 被中断则在等待队列中删除该节点
+                removeWaiter(q);
+                // 抛出InterruptedException异常
+                throw new InterruptedException();
+            }
+
+            int s = state;
+            // 2. 获取当前状态，如果状态大于COMPLETING
+            if (s > COMPLETING) {
+                // 说明任务已经结束(要么正常结束，要么异常结束，要么被取消)
+                if (q != null)
+                    // 把thread显示置空
+                    q.thread = null;
+                // 返回结果
+                return s;
+            }
+            // 3. 如果状态处于中间状态COMPLETING
+            // 表示任务已经结束但是任务执行线程还没来得及给outcome赋值
+            else if (s == COMPLETING) // cannot time out yet
+                Thread.yield();// 让出执行权让其他线程优先执行
+            // 4. 如果等待节点为空，则构造一个等待节点
+            else if (q == null)
+                q = new WaitNode();
+            // 5. 如果还没有入队列，则把当前节点加入waiters首节点并替换原来waiters
+            else if (!queued)
+                queued = UNSAFE.compareAndSwapObject(this, waitersOffset,
+                                                     q.next = waiters, q);
+            else if (timed) {
+                // 如果需要等待特定时间，则先计算要等待的时间
+                // 如果已经超时，则删除对应节点并返回对应的状态
+                nanos = deadline - System.nanoTime();
+                if (nanos <= 0L) {
+                    removeWaiter(q);
+                    return state;
+                }
+                // 6. 阻塞等待特定时间
+                LockSupport.parkNanos(this, nanos);
+            }
+            // 6. 阻塞等待直到被其他线程唤醒
+            else
+                LockSupport.park(this);
+        }
+    }
+
+
+    private void removeWaiter(WaitNode node) {
+        if (node != null) {
+            // 将thread设置为null是因为下面要根据thread是否为null判断是否要把node移出
+            node.thread = null;
+            // 这里自旋保证删除成功
+            retry:
+            for (;;) {          // restart on removeWaiter race
+                for (WaitNode pred = null, q = waiters, s; q != null; q = s) {
+                    s = q.next;
+                    // q.thread != null说明该q节点不需要移除
+                    if (q.thread != null)
+                        pred = q;
+                    // 如果q.thread == null，且pred != null，需要删除q节点
+                    else if (pred != null) {
+                        // 删除q节点
+                        pred.next = s;
+                         // pred.thread == null时说明在并发情况下被其他线程修改了；
+                         // 返回第一个for循环重试
+                        if (pred.thread == null) // check for race
+                            continue retry;
+                    }
+                     // 如果q.thread != null且pred == null，说明q是栈顶节点
+                     // 设置栈顶元素为s节点，如果失败则返回重试
+                    else if (!UNSAFE.compareAndSwapObject(this, waitersOffset,
+                                                          q, s))
+                        continue retry;
+                }
+                break;
+            }
+        }
+    }
+
+    // Unsafe mechanics
+    private static final sun.misc.Unsafe UNSAFE;
+    private static final long stateOffset;
+    private static final long runnerOffset;
+    private static final long waitersOffset;
+    static {
+        try {
+            UNSAFE = sun.misc.Unsafe.getUnsafe();
+            Class<?> k = FutureTask.class;
+            stateOffset = UNSAFE.objectFieldOffset
+                (k.getDeclaredField("state"));
+            runnerOffset = UNSAFE.objectFieldOffset
+                (k.getDeclaredField("runner"));
+            waitersOffset = UNSAFE.objectFieldOffset
+                (k.getDeclaredField("waiters"));
+        } catch (Exception e) {
+            throw new Error(e);
+        }
+    }
+
+}
+
+```
+## 线程池中的线程初始化
+
+　　默认情况下，创建线程池之后，线程池中是没有线程的，需要提交任务之后才会创建线程。在实际中如果需要线程池创建之后立即创建线程，可以通过以下两个方法办到：
+* prestartCoreThread()：初始化一个核心线程；
+* prestartAllCoreThreads()：初始化所有核心线程
+
+## 线程池的关闭
+ThreadPoolExecutor提供了两个方法，用于线程池的关闭
+* shutdown()：不会立即终止线程池，而是要等所有任务缓存队列中的任务都执行完后才终止，但再也不会接受新的任务
+* shutdownNow()：立即终止线程池，并尝试打断正在执行的任务，并且清空任务缓存队列，返回尚未执行的任务
+
+## 线程池大小
+1. 粗略
+    1. 如果是CPU密集型任务，就需要尽量压榨CPU，参考值可以设为 NCPU+1
+    2. 如果是IO密集型任务，参考值可以设置为2*NCPU
+2. 精确：（(线程等待时间+线程CPU时间）/线程CPU时间 ）* CPU数目
+3. 最佳：压测
+
+## 任务缓存队列
+
+**workQueue**，它用来存放等待执行的任务。BlockingQueue 是个接口，你需要使用它的实现之一来使用BlockingQueue，java.util.concurrent包下具有以下 BlockingQueue 接口的实现类：
+* ArrayBlockingQueue：ArrayBlockingQueue 是一个有界的阻塞队列，其内部实现是将对象放到一个数组里。有界也就意味着，它不能够存储无限多数量的元素。它有一个同一时间能够存储元素数量的上限。你可以在对其初始化的时候设定这个上限，但之后就无法对这个上限进行修改了(译者注：因为它是基于数组实现的，也就具有数组的特性：一旦初始化，大小就无法修改)。
+* LinkedBlockingQueue：LinkedBlockingQueue 内部以一个链式结构(链接节点)对其元素进行存储。如果需要的话，这一链式结构可以选择一个上限。如果没有定义上限，将使用 Integer.MAX_VALUE 作为上限。
+* DelayQueue：DelayQueue 对元素进行持有直到一个特定的延迟到期。注入其中的元素必须实现 java.util.concurrent.Delayed 接口。
+* PriorityBlockingQueue：PriorityBlockingQueue 是一个无界的并发队列。它使用了和类 java.util.PriorityQueue 一样的排序规则。你无法向这个队列中插入 null 值。所有插入到 PriorityBlockingQueue 的元素必须实现 java.lang.Comparable 接口。因此该队列中元素的排序就取决于你自己的 Comparable 实现。
+* SynchronousQueue：SynchronousQueue 是一个特殊的队列，它的内部同时只能够容纳单个元素。如果该队列已有一元素的话，试图向队列中插入一个新元素的线程将会阻塞，直到另一个线程将该元素从队列中抽走。同样，如果该队列为空，试图向队列中抽取一个元素的线程将会阻塞，直到另一个线程向队列中插入了一条新的元素。据此，把这个类称作一个队列显然是夸大其词了。它更多像是一个汇合点。
+
+
+## 线程池总结
+1. 线程池刚创建时，里面没有一个线程。任务队列是作为参数传进来的。不过，就算队列里面有任务，线程池也不会马上执行它们。
+2. 当调用 execute() 方法添加一个任务时，线程池会做如下判断：
+     1. 如果正在运行的线程数量小于 corePoolSize，那么马上创建线程运行这个任务；
+     2. 如果正在运行的线程数量大于或等于 corePoolSize，那么将这个任务放入队列；
+     3. 如果这时候队列满了，而且正在运行的线程数量小于 maximumPoolSize，那么还是要创建非核心线程立刻运行这个任务；
+     4. 如果队列满了，而且正在运行的线程数量大于或等于 maximumPoolSize，那么线程池会抛出异常RejectExecutionException。
+     5. 当一个线程完成任务时，它会从队列中取下一个任务来执行。
+     6. 当一个线程无事可做，超过一定的时间（keepAliveTime）时，线程池会判断，如果当前运行的线程数大于 corePoolSize，那么这个线程就被停掉。所以线程池的所有任务完成后，它最终会收缩到 corePoolSize 的大小。
 
