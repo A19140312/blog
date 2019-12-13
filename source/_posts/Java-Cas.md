@@ -13,7 +13,7 @@ comments: false
 # CAS
 
 在看线程池源码的时候发现有很多CAS操作，那么什么是CAS？
-
+<!-- more -->
 ## 定义
 CAS是英文单词 Compare And Swap 的缩写，翻译过来就是比较并替换，它是一种原子操作，同时 CAS 是一种乐观机制。
 java.util.concurrent 包很多功能都是建立在 CAS 之上，如 ReenterLock 内部的 AQS，各种原子类，其底层都用 CAS来实现原子操作。

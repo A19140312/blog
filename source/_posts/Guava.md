@@ -13,7 +13,7 @@ comments: false
 官方首页：http://code.google.com/p/guava-libraries
 英文文档：http://www.ostools.net/apidocs/apidoc?api=guava
 中文文档：https://www.kancloud.cn/wizardforcel/java-opensource-doc/112616
-
+<!-- more -->
 ### 博客
 * [Guava 学习笔记：Google Guava 类库简介](http://www.iocoder.cn/Guava/peida/intro/)
 * [Guava 学习笔记：Optional 优雅的使用null](http://www.iocoder.cn/Guava/peida/Optional/)
