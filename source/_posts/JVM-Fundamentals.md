@@ -17,7 +17,7 @@ JVM由三个主要的子系统构成
 * 类加载子系统
 * 运行时数据区(内存结构)
 * 执行引擎
-![](JVM-Fundamentals/1.png)
+<img src="JVM-Fundamentals/1.png" width="80%" height="80%">
 
 ## 类加载机制
 ### 类的生命周期
@@ -50,8 +50,7 @@ JVM由三个主要的子系统构成
 负责加载ClassPath路径下的类包
 #### 用户自定义加载器(User ClassLoader)
 负责加载用户自定义路径下的类包
-
-![](JVM-Fundamentals/3.png)
+<img src="JVM-Fundamentals/3.png" width="50%" height="50%">
 
 ### 类加载机制
 #### 全盘负责委托机制
@@ -59,7 +58,7 @@ JVM由三个主要的子系统构成
 
 #### 双亲委派机制
 指先委托父类加载器寻找目标类，在找不到的情况下，在自己的路径中查找并载入目标类
-![](JVM-Fundamentals/4.png)
+<img src="JVM-Fundamentals/4.png" width="50%" height="50%">
 1. 当有类需要加载，系统类加载器先判断有没有父类，有交给扩展类加载器加载
 2. 扩展类加载器判断有没有父类，有交给启动类加载器
 3. 启动类加载器没有父类，去实际加载该类，该类不是JRE包下的类，交给子类扩展类加载器去加载
@@ -150,24 +149,24 @@ public class Demo {
 }
 ```
 当执行👆Demo的math方法时，主线程内存会如何操作
-![](JVM-Fundamentals/5.1.png)
+<img src="JVM-Fundamentals/5.1.png" width="50%" height="50%">
 第一步，现将1放入`操作数栈`
-![](JVM-Fundamentals/5.2.png)
+<img src="JVM-Fundamentals/5.2.png" width="50%" height="50%">
 第二步，将1放入`局部变量表`中第一个槽里
-![](JVM-Fundamentals/5.3.png)
+<img src="JVM-Fundamentals/5.3.png" width="50%" height="50%">
 第三步，第四步同上，最终将2放入`局部变量表`中第二个槽里
-![](JVM-Fundamentals/5.4.png)
+<img src="JVM-Fundamentals/5.4.png" width="50%" height="50%">
 第五步，将1复制一份放入`操作数栈`的栈顶
 第六步，将2复制一份放入`操作数栈`的栈顶
-![](JVM-Fundamentals/5.5.png)
+<img src="JVM-Fundamentals/5.5.png" width="50%" height="50%">
 第七步，将2，1弹出操作数栈交给cpu去运算得到3，放到`操作数栈`的栈顶
-![](JVM-Fundamentals/5.6.png)
+<img src="JVM-Fundamentals/5.6.png" width="50%" height="50%">
 第八步，从常量池（-128～127）里拿到10，放入`操作数栈`顶
-![](JVM-Fundamentals/5.7.png)
+<img src="JVM-Fundamentals/5.7.png" width="50%" height="50%">
 第九步，弹出10，3交给cpu去运算得到30，放到`操作数栈`的栈顶（jvm1.6开始进行了指令优化，第8、9步合并成了一步操作）
-![](JVM-Fundamentals/5.8.png)
+<img src="JVM-Fundamentals/5.8.png" width="50%" height="50%">
 第十步，将30放到`局部变量表`中第3个槽里。
-![](JVM-Fundamentals/5.9.png)
+<img src="JVM-Fundamentals/5.9.png" width="50%" height="50%">
 第十一步，将30复制一份放入`操作数栈`第栈顶。
 第十二步，将30弹出操作数栈，通过`返回地址`返回。
 
