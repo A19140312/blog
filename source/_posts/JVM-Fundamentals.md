@@ -11,14 +11,14 @@ copyright: true
 comments: false
 ---
 Java虚拟机(java virtual machine，JVM)，一种能够运行java字节码的虚拟机。作为一种编程语言的虚拟机，实际上不只是专用于Java语言，只要生成的编译文件匹配JVM对加载编译文件格式要求，任何语言都可以由JVM编译运行。 比如kotlin、scala等。
-<!-- more -->
+
 # JVM基本结构
 JVM由三个主要的子系统构成
 * 类加载子系统
 * 运行时数据区(内存结构)
 * 执行引擎
 <img src="JVM-Fundamentals/1.png" width="80%" height="80%">
-
+<!-- more -->
 ## 类加载机制
 ### 类的生命周期
 ![](JVM-Fundamentals/2.png)
