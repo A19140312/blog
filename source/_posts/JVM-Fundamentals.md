@@ -19,9 +19,11 @@ JVM由三个主要的子系统构成
 * 执行引擎
 <img src="JVM-Fundamentals/1.png" width="80%" height="80%">
 <!-- more -->
+
 ## 类加载机制
 ### 类的生命周期
 ![](JVM-Fundamentals/2.png)
+
 1. 加载：将.class文件从磁盘读到内存
     * 通过类的全限定名(com.xxx.xxx)+类加载器确定唯一的类，来获取定义此类的二进制字节流
     * 将这个类字节流代表的静态存储结构转为方法区的运行时数据结构

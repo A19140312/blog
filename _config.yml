@@ -15,7 +15,7 @@ timezone:              # 网站时区，用于生成页面时填充相关时间�
 ## 如果你的站点要放入子目录, 请将url设置为'http://yoursite.com/child' 并将根目录设置为'/child/'
 url: https://a19140312.github.io/     # 站点网址
 root: /                               # 网站根目录
-permalink: :year/:month/:day/:title/  #文单的永久链接格式
+permalink: :category/:title/          #文单的永久链接格式
 permalink_defaults:                   # 永久链接中各部分的默认值
 
 
@@ -43,7 +43,7 @@ highlight:                # 代码块的设置
   enable: true
   line_number: true
   auto_detect: false
-  tab_replace:
+  tab_replace: false
 
 
 # Home page setting
@@ -69,7 +69,7 @@ time_format: HH:mm:ss   # 时间格式
 
 # 分页
 ## 每页显示的文章量 (0 = 关闭分页功能)
-per_page: 10
+per_page: 5
 pagination_dir: page
 
 # 扩展

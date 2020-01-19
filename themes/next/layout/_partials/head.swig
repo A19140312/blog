@@ -165,3 +165,6 @@
 {% endif %}
 
 {% include 'head/custom-head.swig' %}
+
+<script src="https://neveryu.github.io/js/src/pace.min.js"></script>
+<script data-ad-client="ca-pub-3961457011147580" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
