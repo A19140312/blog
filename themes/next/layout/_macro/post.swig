@@ -61,6 +61,11 @@
         {% endif %}
 
         <div class="post-meta">
+        {% if post.top %}
+            <i class="fa fa-thumb-tack"></i>
+            <font color="green">置顶</font>
+            <span class="post-meta-divider">|</span>
+        {% endif %}
           <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
             <a href="/authors/{{ post.author }}" itemprop="url" rel="index">
               <span itemprop="name">{{ post.author }}</span>

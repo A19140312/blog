@@ -3,7 +3,7 @@
 ## Source: https://github.com/hexojs/hexo/
 
 # 网站配置
-title: qing's blog     # 网站标题
+title: qing's 随笔      # 网站标题
 subtitle:              # 网站副标题
 description:           # 网站描述
 author: guyuqing       # 你的昵称
@@ -95,7 +95,7 @@ post_end_tag:
 # Live2D
 # https://github.com/EYHN/hexo-helper-live2d
 live2d:
-  enable: false
+  enable: true
   pluginRootPath: live2dw/
   pluginJsPath: lib/
   pluginModelPath: assets/
