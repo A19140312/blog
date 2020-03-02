@@ -1,8 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>设计模式-单例模式</title>
+    <url>/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/Design-Pattern-Singleton/</url>
+    <content><![CDATA[<h2 id="单例模式"><a href="#单例模式" class="headerlink" title="单例模式"></a>单例模式</h2><p>多个线程操作不同实例对象。多个线程要操作同一对象，要保证对象的唯一性</p>
+<h2 id="单例模式的特点"><a href="#单例模式的特点" class="headerlink" title="单例模式的特点"></a>单例模式的特点</h2><ol>
+<li>有一个实例化的过程（只有一次），产生实例化对象</li>
+<li>提供返回实例对象的方法</li>
+</ol>
+<h2 id="单例模式的分类"><a href="#单例模式的分类" class="headerlink" title="单例模式的分类"></a>单例模式的分类</h2><h3 id="饿汉式"><a href="#饿汉式" class="headerlink" title="饿汉式"></a>饿汉式</h3><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">HungrySingleton</span> </span>&#123;</span><br><span class="line">	<span class="comment">//加载时就产生了实例对象</span></span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">static</span> HungrySingleton instance = <span class="keyword">new</span> HungrySingleton();</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">private</span> <span class="title">HungrySingleton</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">//返回实例对象</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> HungrySingleton <span class="title">getInstance</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> instance;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span> ; i &lt; <span class="number">10</span> ; i ++)&#123;</span><br><span class="line">			<span class="keyword">new</span> Thread(()-&gt;&#123;</span><br><span class="line">				HungrySingleton hungerySingleton = HungrySingleton.getInstance();</span><br><span class="line">				System.out.println(hungerySingleton);</span><br><span class="line">			&#125;).start();</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>线程安全性：在加载的时候已经被实例化，所以只有这一次，线程安全的。</li>
+<li>懒加载：没有延迟加载</li>
+<li>性能：长时间不使用，数据一直放在堆中影响性能</li>
+</ul>
+<h3 id="懒汉式"><a href="#懒汉式" class="headerlink" title="懒汉式"></a>懒汉式</h3><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">LazySingleton</span> </span>&#123;</span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">static</span> LazySingleton instance = <span class="keyword">null</span>;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">private</span> <span class="title">LazySingleton</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> LazySingleton <span class="title">getInstance</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">if</span>(instance == <span class="keyword">null</span>)&#123;</span><br><span class="line">			instance = <span class="keyword">new</span> LazySingleton();</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">return</span> instance;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span> ; i &lt; <span class="number">10</span> ; i ++)&#123;</span><br><span class="line">		    <span class="keyword">new</span> Thread(()-&gt; System.out.println(LazySingleton.getInstance())).start();</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>线程安全性：不能保证实例对象的唯一性</li>
+<li>懒加载：有延迟加载</li>
+<li>性能：使用时才进行加载，性能较好</li>
+</ul>
+<h3 id="懒汉式-同步方法"><a href="#懒汉式-同步方法" class="headerlink" title="懒汉式+同步方法"></a>懒汉式+同步方法</h3><p>将懒汉式的get方法加上synchronized</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">static</span> LazySingleton <span class="title">getInstance</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	<span class="keyword">if</span>(instance == <span class="keyword">null</span>)&#123;</span><br><span class="line">		instance = <span class="keyword">new</span> LazySingleton();</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> instance;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>线程安全性：synchronized保证线程安全</li>
+<li>懒加载：有延迟加载</li>
+<li>性能：多个线程调用该方法时 synchronized 会使线程阻塞，退化到了串行执行</li>
+</ul>
+<h3 id="Double-Check-Locking"><a href="#Double-Check-Locking" class="headerlink" title="Double-Check-Locking"></a>Double-Check-Locking</h3><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DCLSingleton</span> </span>&#123;</span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">static</span> DCLSingleton instance = <span class="keyword">null</span>;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">private</span> <span class="title">DCLSingleton</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> DCLSingleton <span class="title">getInstance</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">if</span>(instance == <span class="keyword">null</span>)&#123;</span><br><span class="line">			<span class="keyword">synchronized</span> (DCLSingleton.class)&#123;</span><br><span class="line">				<span class="keyword">if</span>(instance == <span class="keyword">null</span>)&#123;</span><br><span class="line">					instance = <span class="keyword">new</span> DCLSingleton();</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">return</span> instance;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span> ; i &lt; <span class="number">10</span> ; i ++)&#123;</span><br><span class="line">			<span class="keyword">new</span> Thread(()-&gt; System.out.println(DCLSingleton.getInstance())).start();</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>线程安全性：线程安全</li>
+<li>懒加载：有延迟加载</li>
+<li>性能：性能比较好</li>
+<li>缺点：会因为指令重排，引起空指针异常。</li>
+</ul>
+<h3 id="Volatile-Double-check"><a href="#Volatile-Double-check" class="headerlink" title="Volatile+Double-check"></a>Volatile+Double-check</h3><p>添加volatile 避免空指针异常。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">volatile</span> <span class="keyword">static</span> DCLSingleton instance = <span class="keyword">null</span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="Holder"><a href="#Holder" class="headerlink" title="Holder"></a>Holder</h3><p>声明类的时候，成员变量中不声明实例变量，而放到内部静态类中，</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">HolderSingleton</span> </span>&#123;</span><br><span class="line">	<span class="function"><span class="keyword">private</span> <span class="title">HolderSingleton</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">//通过内部类实现懒加载，只有调用时才会进行实例化，静态类只能实例一次，保证线程安全</span></span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Holder</span></span>&#123;</span><br><span class="line">		<span class="keyword">private</span> <span class="keyword">static</span> HolderSingleton instance=<span class="keyword">new</span> HolderSingleton();</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> HolderSingleton <span class="title">getInstance</span><span class="params">()</span></span>&#123;</span><br><span class="line">		<span class="keyword">return</span> Holder.instance;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="枚举"><a href="#枚举" class="headerlink" title="枚举"></a>枚举</h3><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">EnumSingleton</span> </span>&#123;</span><br><span class="line">	<span class="function"><span class="keyword">private</span> <span class="title">EnumSingleton</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">//延迟加载</span></span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">enum</span> EnumHolder&#123;</span><br><span class="line">		INSTANCE;</span><br><span class="line">		<span class="keyword">private</span> EnumSingleton instance=<span class="keyword">null</span>;</span><br><span class="line"></span><br><span class="line">		EnumHolder() &#123;</span><br><span class="line">			<span class="keyword">this</span>.instance = <span class="keyword">new</span> EnumSingleton();</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> EnumSingleton <span class="title">getInstance</span><span class="params">()</span></span>&#123;</span><br><span class="line">		<span class="keyword">return</span> EnumHolder.INSTANCE.instance;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+]]></content>
+      <categories>
+        <category>设计模式</category>
+      </categories>
+      <tags>
+        <tag>设计模式</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>JAVA-Volatile</title>
-    <url>/JAVA/JAVA-Volatile/</url>
+    <url>/JAVA/Java-Volatile/</url>
     <content><![CDATA[<h2 id="Volatile关键字"><a href="#Volatile关键字" class="headerlink" title="Volatile关键字"></a>Volatile关键字</h2><p>java编程语言允许线程访问共享变量，为了确保共享变量能被准确和一致的更新，线程应该确保通过排他锁单独获得这个变量。Java语言提供了volatile，在某些情况下比锁更加方便。如果一个字段被声明成volatile，java线程内存模型确保所有线程看到这个变量的值是一致的。</p>
 <h2 id="机器硬件CPU与JMM"><a href="#机器硬件CPU与JMM" class="headerlink" title="机器硬件CPU与JMM"></a>机器硬件CPU与JMM</h2><a href="/JAVA/Java-MemoryModel/" title="点击这里查看这篇文章">点击这里查看这篇文章</a>
 
@@ -2069,35 +2123,6 @@
       </tags>
   </entry>
   <entry>
-    <title>C++右值引用</title>
-    <url>/C/C++-02/</url>
-    <content><![CDATA[<h2 id="左值与右值的区分"><a href="#左值与右值的区分" class="headerlink" title="左值与右值的区分"></a>左值与右值的区分</h2><p>在C++中，所有的值均被分为左值与右值之一。左值是指表达式结束后依然存在的<strong>持久化对象</strong>，右值是指表达式结束时就不再存在的<strong>临时对象</strong>。所有的具名变量或者对象都是左值，而右值不具名。有一个很简单的方法区别左值与右值，<strong>观察是否可以对表达式进行取地址，如果能，则为左值，否则为右值。</strong></p>
-<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">func</span><span class="params">()</span> </span>&#123;<span class="keyword">return</span> func;&#125;</span><br><span class="line"><span class="keyword">int</span> a = <span class="number">1</span> + <span class="number">2</span>;</span><br><span class="line"><span class="keyword">int</span> b = func();</span><br><span class="line"><span class="keyword">int</span> c = a + b;</span><br><span class="line"><span class="keyword">int</span> d = c;</span><br></pre></td></tr></table></figure>
-
-<a id="more"></a>
-<p>如上图所示，第2行的 a显然是左值，而(1 + 2)产生的临时变量值则为右值。同理第3行的b为左值，而func()的返回值同样是一个临时变量，为右值。第4行的c为左值，而(a+b)作为临时变量则为右值，而第5行中，d与c都为左值。套用上述的区别方法，a,b,c,d变量均可以进行取地址操作，而(1+2), func()返回值, (a+b)我们都无法取其地址。<br>如书中记载，在C++11中，右值分为<strong>纯右值</strong>与<strong>将亡值</strong>。纯右值指的就是我们上述所描述的各类临时变量。而将亡值则是c++11新增的和右值引用相关的表达式，这样的表达式通常时将要移动的对象、T&amp;&amp;函数返回值、std::move()函数的返回值等，将亡值与纯右值均为右值，使用没有任何区别。</p>
-<h2 id="左值引用与右值引用"><a href="#左值引用与右值引用" class="headerlink" title="左值引用与右值引用"></a>左值引用与右值引用</h2><p>在C++11前引用已经非常常见了，就是给变量取了一个别名，如下所示。</p>
-<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="keyword">int</span> b = <span class="number">1</span>;</span><br><span class="line"><span class="keyword">int</span> &amp;a = b;</span><br><span class="line"><span class="keyword">int</span> &amp;c = <span class="number">2</span>;   <span class="comment">//编译错误!</span></span><br></pre></td></tr></table></figure>
-
-<p>需注意，在定义左值引用的同时，我们不能将右值绑定至左值引用上，如上面第3行代码所示。<br>而C++的右值引用同左值引用相似，则使用 &amp;&amp; 来表示。</p>
-<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">func</span><span class="params">()</span> </span>&#123;<span class="keyword">return</span> <span class="number">1</span>;&#125;</span><br><span class="line"><span class="keyword">int</span> &amp;&amp; a = <span class="number">1</span>;</span><br><span class="line"><span class="keyword">int</span> &amp;&amp; b = (<span class="number">1</span> + <span class="number">2</span>) * <span class="number">3</span>;</span><br><span class="line"><span class="keyword">int</span> &amp;&amp; c = func();</span><br><span class="line"><span class="keyword">int</span> &amp;&amp; d = a;    <span class="comment">//编译错误!</span></span><br></pre></td></tr></table></figure>
-
-<p>同左值引用相同，在定义右值引用的同时，我们不能将左值绑定在右值引用上，如上面第5行所示。<br>也就是说，右值引用只能绑定右值，左值引用只能绑定左值。<br>若希望将一个左值绑定到右值引用，则可以使用<strong>移动语义</strong><code>std::move()</code>将左值转换为右值，例如:</p>
-<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="keyword">int</span> a = <span class="number">1</span>;</span><br><span class="line"><span class="keyword">int</span> &amp;&amp;b = <span class="built_in">std</span>::move(a);  <span class="comment">//编译通过</span></span><br></pre></td></tr></table></figure>
-
-<p>但是注意，<strong>使用移动移动语义转移对象a后，a不可再次被使用</strong>!<br>除了普通引用，还有一类我们经常使用到的引用，<strong>常量左值引用</strong>。大家可以显而易见的发现，常量左值引用是个“万能”的引用类型。它可以接受非常量左值、常量左值、右值对其进行初始化。但是在它的存活时期中，它只能是可读的。我们常在函数参数中使用到它，如下所示。</p>
-<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">func</span><span class="params">(<span class="keyword">const</span> <span class="built_in">string</span> &amp;str)</span> </span>&#123;</span><br><span class="line">	<span class="built_in">cout</span> &lt;&lt; str &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span> *argv[])</span> </span>&#123;</span><br><span class="line">	<span class="function"><span class="built_in">string</span> <span class="title">s1</span><span class="params">(<span class="string">"1234"</span>)</span></span>;</span><br><span class="line">	<span class="function"><span class="keyword">const</span> <span class="built_in">string</span> <span class="title">s2</span><span class="params">(<span class="string">"1234"</span>)</span></span>;</span><br><span class="line">	func(s1);                  <span class="comment">//非常量左值</span></span><br><span class="line">	func(s2);                  <span class="comment">//常量左值</span></span><br><span class="line">	func(<span class="built_in">string</span>(<span class="string">"1234"</span>));      <span class="comment">//右值</span></span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>在如上介绍中很容易可以得出一下结论(转载图片)：<br><img src="/C/C++-02/1.png" alt="表格1"></p>
-]]></content>
-      <categories>
-        <category>C++</category>
-      </categories>
-      <tags>
-        <tag>C++</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>C++强制类型转换</title>
     <url>/C/C++-01/</url>
     <content><![CDATA[<h2 id="C语言类型转换"><a href="#C语言类型转换" class="headerlink" title="C语言类型转换"></a>C语言类型转换</h2><p>c语言类型转换有如下两种(旧式转型)</p>
@@ -2142,6 +2167,35 @@
 <blockquote>
 <p>如果可以，尽量避免转型，特别是在注重效率的代码中避免 dynamic_cast。如果有个设计需要转型的动作，试着发展无需转型的替代设计。<br>如果转型是必要的，试着将它隐藏至某个函数背后，客户随后可以调用该函数，而不需将转型放进他们的代码内。<br>宁可使用C++-style(新式转型)，不要使用旧式转型。前者很容易辨识出来，而且有其不同的职责。</p>
 </blockquote>
+]]></content>
+      <categories>
+        <category>C++</category>
+      </categories>
+      <tags>
+        <tag>C++</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>C++右值引用</title>
+    <url>/C/C++-02/</url>
+    <content><![CDATA[<h2 id="左值与右值的区分"><a href="#左值与右值的区分" class="headerlink" title="左值与右值的区分"></a>左值与右值的区分</h2><p>在C++中，所有的值均被分为左值与右值之一。左值是指表达式结束后依然存在的<strong>持久化对象</strong>，右值是指表达式结束时就不再存在的<strong>临时对象</strong>。所有的具名变量或者对象都是左值，而右值不具名。有一个很简单的方法区别左值与右值，<strong>观察是否可以对表达式进行取地址，如果能，则为左值，否则为右值。</strong></p>
+<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">func</span><span class="params">()</span> </span>&#123;<span class="keyword">return</span> func;&#125;</span><br><span class="line"><span class="keyword">int</span> a = <span class="number">1</span> + <span class="number">2</span>;</span><br><span class="line"><span class="keyword">int</span> b = func();</span><br><span class="line"><span class="keyword">int</span> c = a + b;</span><br><span class="line"><span class="keyword">int</span> d = c;</span><br></pre></td></tr></table></figure>
+
+<a id="more"></a>
+<p>如上图所示，第2行的 a显然是左值，而(1 + 2)产生的临时变量值则为右值。同理第3行的b为左值，而func()的返回值同样是一个临时变量，为右值。第4行的c为左值，而(a+b)作为临时变量则为右值，而第5行中，d与c都为左值。套用上述的区别方法，a,b,c,d变量均可以进行取地址操作，而(1+2), func()返回值, (a+b)我们都无法取其地址。<br>如书中记载，在C++11中，右值分为<strong>纯右值</strong>与<strong>将亡值</strong>。纯右值指的就是我们上述所描述的各类临时变量。而将亡值则是c++11新增的和右值引用相关的表达式，这样的表达式通常时将要移动的对象、T&amp;&amp;函数返回值、std::move()函数的返回值等，将亡值与纯右值均为右值，使用没有任何区别。</p>
+<h2 id="左值引用与右值引用"><a href="#左值引用与右值引用" class="headerlink" title="左值引用与右值引用"></a>左值引用与右值引用</h2><p>在C++11前引用已经非常常见了，就是给变量取了一个别名，如下所示。</p>
+<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="keyword">int</span> b = <span class="number">1</span>;</span><br><span class="line"><span class="keyword">int</span> &amp;a = b;</span><br><span class="line"><span class="keyword">int</span> &amp;c = <span class="number">2</span>;   <span class="comment">//编译错误!</span></span><br></pre></td></tr></table></figure>
+
+<p>需注意，在定义左值引用的同时，我们不能将右值绑定至左值引用上，如上面第3行代码所示。<br>而C++的右值引用同左值引用相似，则使用 &amp;&amp; 来表示。</p>
+<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">func</span><span class="params">()</span> </span>&#123;<span class="keyword">return</span> <span class="number">1</span>;&#125;</span><br><span class="line"><span class="keyword">int</span> &amp;&amp; a = <span class="number">1</span>;</span><br><span class="line"><span class="keyword">int</span> &amp;&amp; b = (<span class="number">1</span> + <span class="number">2</span>) * <span class="number">3</span>;</span><br><span class="line"><span class="keyword">int</span> &amp;&amp; c = func();</span><br><span class="line"><span class="keyword">int</span> &amp;&amp; d = a;    <span class="comment">//编译错误!</span></span><br></pre></td></tr></table></figure>
+
+<p>同左值引用相同，在定义右值引用的同时，我们不能将左值绑定在右值引用上，如上面第5行所示。<br>也就是说，右值引用只能绑定右值，左值引用只能绑定左值。<br>若希望将一个左值绑定到右值引用，则可以使用<strong>移动语义</strong><code>std::move()</code>将左值转换为右值，例如:</p>
+<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="keyword">int</span> a = <span class="number">1</span>;</span><br><span class="line"><span class="keyword">int</span> &amp;&amp;b = <span class="built_in">std</span>::move(a);  <span class="comment">//编译通过</span></span><br></pre></td></tr></table></figure>
+
+<p>但是注意，<strong>使用移动移动语义转移对象a后，a不可再次被使用</strong>!<br>除了普通引用，还有一类我们经常使用到的引用，<strong>常量左值引用</strong>。大家可以显而易见的发现，常量左值引用是个“万能”的引用类型。它可以接受非常量左值、常量左值、右值对其进行初始化。但是在它的存活时期中，它只能是可读的。我们常在函数参数中使用到它，如下所示。</p>
+<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">func</span><span class="params">(<span class="keyword">const</span> <span class="built_in">string</span> &amp;str)</span> </span>&#123;</span><br><span class="line">	<span class="built_in">cout</span> &lt;&lt; str &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span> *argv[])</span> </span>&#123;</span><br><span class="line">	<span class="function"><span class="built_in">string</span> <span class="title">s1</span><span class="params">(<span class="string">"1234"</span>)</span></span>;</span><br><span class="line">	<span class="function"><span class="keyword">const</span> <span class="built_in">string</span> <span class="title">s2</span><span class="params">(<span class="string">"1234"</span>)</span></span>;</span><br><span class="line">	func(s1);                  <span class="comment">//非常量左值</span></span><br><span class="line">	func(s2);                  <span class="comment">//常量左值</span></span><br><span class="line">	func(<span class="built_in">string</span>(<span class="string">"1234"</span>));      <span class="comment">//右值</span></span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在如上介绍中很容易可以得出一下结论(转载图片)：<br><img src="/C/C++-02/1.png" alt="表格1"></p>
 ]]></content>
       <categories>
         <category>C++</category>

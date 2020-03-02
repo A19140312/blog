@@ -3,7 +3,7 @@ title: JAVA-CAS
 date: 2019-10-23 14:41:04
 tags:
     - JAVA
-    - CAS
+    - 并发
     - 学习笔记
 categories: JAVA
 author: Guyuqing
@@ -93,9 +93,9 @@ public class AtomicInteger extends Number implements java.io.Serializable {
 }
 
 ```
-**Unsafe**：是CAS的核心类，它可以提供硬件级别的原子操作，它可以获取某个属性在内存中的位置，也可以修改对象的字段值，其底层是用 C/C++ 
+**Unsafe**：是CAS的核心类(后门类，执行CPU指令)，它可以提供硬件级别的原子操作，它可以获取某个属性在内存中的位置，也可以修改对象的字段值，其底层是用 C/C++ 
 **valueOffset**：表示该变量值在内存中的偏移地址，因为Unsafe就是根据内存偏移地址获取数据的。
-**value**：用volatile修饰，保证了多线程之间的内存可见性。
+**value**：要修改的值，用volatile修饰，保证了多线程之间的内存可见性。
 
 
 看看`AtomicInteger`如何实现并发下的累加操作：
@@ -106,10 +106,17 @@ public class AtomicInteger extends Number implements java.io.Serializable {
     }
     
     // unsafe.getAndAddInt
+    /**
+    * var1：要修改的值
+    * var2：期望值偏移地址
+    * var4：要增加的值
+    * var5：当前值
+    * var5 + var4： 当前值+要增加的值 = 目标值
+    */
     public final int getAndAddInt(Object var1, long var2, int var4) {
         int var5;
         do {
-            var5 = this.getIntVolatile(var1, var2);
+            var5 = this.getIntVolatile(var1, var2);//获取对象中offset偏移地址对应的整型field的值
         } while(!this.compareAndSwapInt(var1, var2, var5, var5 + var4));
 
         return var5;
