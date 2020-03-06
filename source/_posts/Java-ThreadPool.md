@@ -79,16 +79,38 @@ comments: false
         5. 所以，任务提交时，判断的顺序为 corePoolSize –> workQueue –> maximumPoolSize
 * maximumPoolSize 最大线程数量；
 * keepAliveTime 线程池维护线程所允许的空闲时间。当线程池中的线程数量大于corePoolSize的时候，如果这时没有新的任务提交，核心线程外的线程不会立即销毁，而是会等待，直到等待的时间超过了keepAliveTime；
-* workQueue 保存等待执行的任务的阻塞队列，当提交一个新的任务到线程池以后, 线程池会根据当前线程池中正在运行着的线程的数量来决定对该任务的处理方式，主要有以下几种处理方式:
+* TimeUnit 线程保持活动的时间单位
+* BlockingQueue<Runnable> workQueue 保存等待执行的任务的阻塞队列，当提交一个新的任务到线程池以后, 线程池会根据当前线程池中正在运行着的线程的数量来决定对该任务的处理方式，主要有以下几种处理方式:
   * **直接切换**：这种方式常用的队列是SynchronousQueue
   * **使用无界队列**：一般使用基于链表的阻塞队列LinkedBlockingQueue。如果使用这种方式，那么线程池中能够创建的最大线程数就是corePoolSize，而maximumPoolSize就不会起作用了。当线程池中所有的核心线程都是RUNNING状态时，这时一个新的任务提交就会放入等待队列中。
   * **使用有界队列**：一般使用ArrayBlockingQueue。使用该方式可以将线程池的最大线程数量限制为maximumPoolSize，这样能够降低资源的消耗，但同时这种方式也使得线程池对线程的调度变得更困难，因为线程池和队列的容量都是有限的值，所以要想使线程池处理任务的吞吐率达到一个相对合理的范围，又想使线程调度相对简单，并且还要尽可能的降低线程池对资源的消耗，就需要合理的设置这两个数量。
 * threadFactory 它是ThreadFactory类型的变量，用来创建新线程。默认使用Executors.defaultThreadFactory() 来创建线程。使用默认的ThreadFactory来创建线程时，会使新创建的线程具有相同的NORM_PRIORITY优先级并且是非守护线程，同时也设置了线程的名称。
-* handler 它是RejectedExecutionHandler类型的变量，表示线程池的饱和策略。如果阻塞队列满了并且没有空闲的线程，这时如果继续提交任务，就需要采取一种策略处理该任务。线程池提供了4种策略：
+* handler 它是RejectedExecutionHandler类型的变量，表示线程池的饱和的**拒绝策略**。如果阻塞队列满了并且没有空闲的线程，这时如果继续提交任务，就需要采取一种策略处理该任务。线程池提供了4种策略：
   * AbortPolicy：直接抛出异常，这是默认策略；
   * CallerRunsPolicy：用调用者所在的线程来执行任务；
   * DiscardOldestPolicy：丢弃阻塞队列中靠最前的任务，并执行当前任务；
   * DiscardPolicy：直接丢弃任务；
+
+## 线程池状态
+```java
+    private static final int COUNT_BITS = Integer.SIZE - 3;
+    private static final int CAPACITY   = (1 << COUNT_BITS) - 1;
+
+    // runState is stored in the high-order bits
+    private static final int RUNNING    = -1 << COUNT_BITS;
+    private static final int SHUTDOWN   =  0 << COUNT_BITS;
+    private static final int STOP       =  1 << COUNT_BITS;
+    private static final int TIDYING    =  2 << COUNT_BITS;
+    private static final int TERMINATED =  3 << COUNT_BITS;
+```
+* COUNT_BITS: 线程的最大位数29位
+* CAPACITY：线程的最大容量
+* RUNNING：运行状态，线程池被一旦被创建，就处于RUNNING状态，并且线程池中的任务数为0
+* SHUTDOWN：线程池处在SHUTDOWN状态时，不接收新任务，但能处理已添加的任务。 
+* STOP：线程池处在STOP状态时，不接收新任务，不处理已添加的任务，并且会中断正在处理的任务。
+* TIDYING：当所有的任务已终止，任务数量”为0，线程池会变为TIDYING状态。当线程池变为TIDYING状态时，会执行钩子函数terminated()。
+* TERMINATED：终止状态，当执行 terminated() 后会更新为这个状态。
+![](Java-ThreadPool/01.png)
 
 ## 核心源码
 
