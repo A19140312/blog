@@ -44,6 +44,10 @@ String：
 StringBuffer： 可以在原有对象的基础上进行操作，线程安全的，性能高于StringBuilder
 StringBuilder： 可以在原有对象的基础上进行操作，非线程安全的
 
+### String和StringBuilder 的区别？
+jdk1.5：string 对象时恒定不变的,stringBuider对象表示的字符串是可变的。所以在字符串频繁修改的情况下stringBuider效率
+jdk1.8: 编译器利用String的可变配套类(StringBuilder)帮我们做了优化，编译器自动调用StringBuilder.apend()方法添加。因此在拼接字符串小于500左右时，两个对象效率相同。
+
 ### JDK 动态代理为什么只能基于接口？
 java的代理对象自动继承了Proxy，又因为JAVA是单继承的，所以目标对象只能实现接口不能继承。
 
