@@ -56,6 +56,90 @@ jdk1.8: 编译器利用String的可变配套类(StringBuilder)帮我们做了优
 ### JDK 动态代理为什么只能基于接口？
 java的代理对象自动继承了Proxy，又因为JAVA是单继承的，所以目标对象只能实现接口不能继承。
 
+### ArrayList 和 Vector 的区别？
+**相同**：
+    * 都实现了 List 接口(List 接口继承了 Collection 接口)
+    * 都是有序集合，即存储在这两个集合中的元素的位置都是有顺序的，相当于一种动态的数组
+    * 允许重复
+
+**区别**：
+    * Vector 是线程安全的，ArrayList 是线程序不安全的。
+**数据增长**:
+    * 相同：ArrayList 与 Vector 都可以设置初始的空间大小
+    * 不同：Vector 还可以设置增长的空间大小，而 ArrayList 没有提供设置增长空间的方法。
+           Vector 默认增加原来的 1 倍，ArrayList 增加原来的 0.5 倍。
+           
+### 快速失败 (fail-fast) 和安全失败 (fail-safe) 的区别是什么?
+Iterator 的安全失败是基于对底层集合做拷贝，因此，它不受源集合上修改的影响。
+
+java.util 包下面的所有的集合类都是快速失败的，迭代器会抛出 ConcurrentModificationException 异常
+java.util.concurrent 包下面的所有的类都是安全失败的。安全失败的迭代器永远不会抛出这样的异常。
+
+###  HashMap 的工作原理是什么?
+HashMap 是 **数组 + 链表 + 红黑树** 实现的。
+* 负载因子（loadFactor）：0.75f
+* 容量（capacity）：16
+* 扩容阈值（threshold）：loadFactor * capacity
+* 转化成树的链表阈值（TREEIFY_THRESHOLD）：8
+* 转化成树的最小容量（MIN_TREEIFY_CAPACITY）：64
+Java 中的 HashMap 是以键值对 (key-value) 的形式存储元素的，我们把一对(key-value)称为Node。
+HashMap 需要 一个 hash 函数，当调用 put() 方法的时候，HashMap 会计算 key 的 hash 值，然后把键值对存储在集合中合适的索引上。 
+如果索引上已经存在了Node，发生哈希冲突。
+    * 如果索引上的结构是**链表**，则在链表中遍历，如果有相同的key，value 会被更新成新值，否则遍历到链表尾部，插入新的(key-value) ，size+1
+        * 如果链表的长度大于**转化成树的链表阈值（TREEIFY_THRESHOLD）** 并且，hashMap的容量大于**转化成树的最小容量（MIN_TREEIFY_CAPACITY）** 则转换成`红黑树`。
+    * 如果索引上的结构是**红黑树**，则在红黑树中遍历，如果有相同的key，value 会被更新成新值，否则插入红黑树，size+1。
+    
+如果 size > threshold 则进行扩容。
+    * 当原来的容量已经达到最大容量的时候，将阈值设置为Integer.MAX_VALUE，这样就不会再发生重构的情况
+    * 将新的阈值设置为旧的阈值的两倍, 新的容量设置为旧容量的2倍。
+    * 根据新容量新建一个Node数组，将旧数组中的元素全部取出，重新映射到新数组中
+    
+### List、Map、Set 三个接口，存取元素时，各有什么特点?
+这样的题属于随意发挥题:这样的题比较考水平，两个方面的水平:一是要真正明白 这些内容，二是要有较强的总结和表述能力。如果你明白，但表述不清楚，在别人那 里则等同于不明白。
+
+首先List与Set
+相同：
+    * 都是单列元素的集合，有一个相同的父类 Collection
+不同：
+    * List 元素可以重复，Set不可以
+    * List 可以按index取元素，Set只能逐一遍历
+    * List 是有序集合。
+
+Map 是双列集合，要存储一对 key/value，不能存储重复的 key。
+
+###  HashSet 的底层实现是什么?
+HashSet 的实现是依赖于 HashMap 的，HashSet 的值都是存储 在 HashMap 中的。在 HashSet 的构造法中会初始化一个 HashMap 对象
+HashSet 不允许值重复，因此，HashSet 的值是作为 HashMap 的 key 存储在 HashMap 中的，当存储的值已经存在时返回 false。
+
+###  Iterator 和 ListIterator 的区别是什么?
+* Iterator 可用来遍历 Set 和 List 集合，但是 ListIterator 只能用来遍历 List。
+* Iterator 对集合只能是前向遍历，ListIterator 既可以前向也可以后向。
+ListIterator 实现了 Iterator 接口，并包含其他的功能，比如:增加元素，替换元 素，获取前一个和后一个元素的索引，等等。
+
+### 数组 (Array) 和列表 (ArrayList) 有什么区别?
+* Array 可以包含基本类型和对象类型，ArrayList 只能包含对象类型。
+* Array 大小是固定的，ArrayList 的大小是动态变化的。
+* ArrayList 处理固定大小的基本数据类型的时候，这种方式相对比较慢。
+
+###  Comparable 和 Comparator 接口是干什么的?
+**Comparable**：只包含一个 compareTo() 方法，这个方法可以个 给两个对象排序。具体来说，它返回负数，0，正数来表明输入对象小于，等于，大于 已经存在的对象。
+**Comparator**：包含 compare() 和 equals() 两个方法。
+    * compare() 方法用来给两个输入参数排序，返回负数，0，正数表明第一个参数是小 于，等于，大于第二个参数。
+    * equals() 方法需要一个对象作为参数，它用来决定输入 参数是否和 comparator 相等。
+    
+### Collection 和 Collections 的区别？
+**Collection**：是集合类的上级接口, 继承与它的接口主要是 set 和 list。
+**Collections**： 类是针对集合类的一个帮助类. 它提供一系列的静态方法对各种集合的搜 索, 排序, 线程安全化等操作。
+
+
+
+
+
+    
+    
+
+
+
 
 <div style="text-align:center;color:#bfbfbf;font-size:16px;">
     <span>------------------------ JVM ------------------------</span>
@@ -104,6 +188,8 @@ java的代理对象自动继承了Proxy，又因为JAVA是单继承的，所以�
 * 本地方法栈（Native Method Stack）: 与虚拟机栈的作用是一样的，只不过虚拟机栈是服务 Java 方法的，而本地方法栈是为虚拟机调用 Native 方法服务的；
 * Java 堆（Java Heap）: Java 虚拟机中内存最大的一块，是被所有线程共享的，几乎所有的对象实例都在这里分配内存；
 * 方法区（Methed Area）: 用于存储已被虚拟机加载的类信息、常量、静态变量、即时编译后的代码等数据。
+
+
 
 <div style="text-align:center;color:#bfbfbf;font-size:16px;">
     <span>------------------------ 多线程 ------------------------</span>
@@ -220,6 +306,46 @@ ABA问题。
 * 尽量降低锁的使用粒度，尽量不要几个功能用同一把锁。
 * 尽量减少同步的代码块。
 
+### 当一个线程进入一个对象的一个 synchronized 方法后，其它线程是否可进入此对象的其它方法?
+* 其他方法前是否加了 synchronized 关键字，如果没加，则能。
+* 如果这个方法内部调用了 wait，则可以进入其他 synchronized 方法。
+
+### 简述 synchronized 和 java.util.concurrent.locks.Lock 的异同?
+相同点:Lock 能完成 synchronized 所实现的所有功能。
+不同点:Lock 有比 synchronized 更精确的线程语义和更好的性能。
+synchronized 会自动释放锁，而 Lock 一定要求程序员手工释放，并且必须在 finally从句中释放。
+Lock 还有更强大的功能，例如，它的 tryLock 方法可以非阻塞方式去拿锁。
+
+### 线程调度(优先级)
+与线程休眠类似，线程的优先级仍然无法保障线程的执行次序。只不过，优先级高的线 程获取 CPU 资源的概率较大，优先级低的并非没机会执行。
+线程的优先级用 1-10 之 间的整数表示，数值越大优先级越高，默认的优先级为 5。 在一个线程中开启另外一个新线程，则新开线程称为该线程的子线程，子线程初始优先级与父线程相同。
+
+### 什么是线程饥饿？
+线程饥饿是另一种活跃性问题，也可以使程序无法执行下去。
+如果一个线程因为处理器时间全部被其他线程抢走而得不到处理器运行时间，这种状态被称之为`饥饿`
+一般是由高优先级线程吞噬所有的低优先级线程的处理器时间引起的。
+
+### 什么是活锁？
+这两个线程虽然都没有停止运行，但是却无法向下执行，这种情况就是所谓的活锁。
+举个例子，两个人在走廊上碰见，大家都互相很有礼貌，互相礼让，A从左到右，B也从从左转向右，发现又挡住了地方，继续转换方向，但又碰到了，反反复复，一直没有机会运行下去。
+* 当所有线程在序中执行 Object.wait(0)，参数为 0 的 wait 方法。程序将发生 活锁直到在相应的对象上有线程调用 Object.notify() 或者 Object.notifyAll()。
+
+### Volatile关键字的作用？
+让其他线程能够马上感知到某一线程多某个变量的修改
+* 保证可见性:对共享变量的修改，其他的线程马上能感知到
+* 保证有序性:禁止重排序（编译阶段、指令优化阶段）volatile之前的代码不能调整到他的后面，volatile之后的代码不能调整到他的前面
+
+### volatile 能使得一个非原子操作变成原子操作吗?
+在 Java 中除了 long 和 double 之外的所有基本类型的读和赋值，都是原子性操作。
+而 64 位的 long 和 double 变量由于会被 JVM 当作两个分离的 32 位来进行操 作，所以不具有原子性，会产生字撕裂问题。但是当你定义 long 或 double 变量时， 如果使用 volatile 关键字，就会获到**(只有简单的赋值与返回操作的)**原子性。
+不能保证其他情况的原子性。
+
+
+
+
+
+
+
 
 <div style="text-align:center;color:#bfbfbf;font-size:16px;">
     <span>------------------------ Spring ------------------------</span>
@@ -227,35 +353,49 @@ ABA问题。
 
 # Spring
 
-## 为什么要使用 spring？
+## 基础
+### 为什么要使用 spring？
 * spring 提供 ioc 技术，容器会帮你管理依赖的对象，从而不需要自己创建和管理依赖对象了，更轻松的实现了程序的解耦。
 * spring 提供了事务支持，使得事务操作变的更加方便。
 * spring 提供了面向切片编程，这样可以更方便的处理某一类的问题。
 * 更方便的框架集成，spring 可以很方便的集成其他框架，比如 MyBatis 等。
 
-## 什么是 aop？
+
+
+## AOP
+### 什么是 aop？
 aop 是面向切面编程，可以通过预编译方式和运行期动态代理实现在不修改源代码的情况下给程序动态统一添加功能的一种技术。
 aop的应用场景：日志记录、权限验证、效率检查、事务管理、exception
 
-## 什么是 ioc？
+## IOC
+### 什么是 ioc？
 控制反转，将你设计好的对象交给容器控制，可以用来减低计算机代码之间的耦合度。
 
-##  spring 常用的注入方式有哪些？
+###  spring 常用的注入方式有哪些？
 * setter 属性注入
 * 构造方法注入
 * 注解方式注入
 
-##  spring 中的 bean 是线程安全的吗？
+###  spring 中的 bean 是线程安全的吗？
 spring 中的 bean 默认是单例模式，spring 框架并没有对单例 bean 进行多线程的封装处理。
 实际上大部分时候 spring bean 无状态的（比如 dao 类），所有某种程度上来说 bean 也是安全的，但如果 bean 有状态的话（比如 view model 对象），那就要开发者自己去保证线程安全了，最简单的就是改变 bean 的作用域，把“singleton”变更为“prototype”，这样请求 bean 相当于 new Bean()了，所以就可以保证线程安全了。
 * 有状态就是有数据存储功能。
 * 无状态就是不会保存数据。
 
-##  spring 自动装配 bean 有哪些方式？
+###  spring 自动装配 bean 有哪些方式？
 * no：默认值，表示没有自动装配，应使用显式 bean 引用进行装配。
 * byName：它根据 bean 的名称注入对象依赖项。
 * byType：它根据类型注入对象依赖项。
 * constructor：通过构造函数来注入依赖项，需要设置大量的参数。
+
+
+### Spring beanFactory 和 factoryBean 的区别？
+**beanFactory** 是Spring容器的顶层接口，用于管理Bean的一个工厂。 在Spring中，所有的Bean都是由BeanFactory(也就是IOC容器)来进行管理的。
+**FactoryBean** 这个Bean不是简单的Bean，而是一个能生产或者修饰对象生成的工厂Bean，它能在需要的时候生产一个对象，且不仅仅限于它自身，它能返回任何Bean的实例。
+
+通常情况下，bean 无须自己实现工厂模式，Spring 容器担任了工厂的 角色；但少数情况下，容器中的 bean 本身就是工厂，作用是产生其他 bean 实例。由工厂 bean 产生的其他 bean 实例，不再由 Spring 容器产生，因此与普通 bean 的配置不同，不再需要提供 class 元素。
+
+
 
 
 

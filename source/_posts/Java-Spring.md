@@ -87,4 +87,200 @@ setter参考文档：https://docs.spring.io/spring-framework/docs/current/spring
 因此B对象设置为Prototype 就没有任何意义。解决方式参考官网。
 
 
+## 自己模拟springbean
+定义几个类
+```java
+public interface UserDao {
+	public String query();
+}
 
+public class UserDaoImpl implements UserDao {
+	@Override
+	public String query() {
+		return "我要减肥～～～";
+	}
+}
+
+public interface UserService {
+	public void find();
+}
+
+public class UserServiceImpl implements UserService {
+
+	UserDao userDao;
+	@Override
+	public void find() {
+		System.out.println(userDao.query() + "hahaha");
+	}
+
+	public void setUserDao(UserDao userDao) {
+		this.userDao = userDao;
+	}
+
+
+//	public UserServiceImpl(UserDao userDao) {
+//		this.userDao = userDao;
+//	}
+}
+```
+
+新建BeanFactory解析xml
+```java
+public class BeanFactory {
+	Map<String,Object> map = new HashMap<>();
+
+	public BeanFactory(String xml) {
+		try {
+			parseXml(xml);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	private void parseXml(String xml) throws Exception {
+		File file = new File(this.getClass().getResource("/").getPath()+"/"+xml);
+		SAXReader reader = new SAXReader();
+		//解析XML形式的文本,得到document对象.
+		Document document = reader.read(file);
+		// 获取文档的根节点.
+		Element elementRoot = document.getRootElement();
+		// <beans default="byType">
+		Attribute attribute = elementRoot.attribute("default-autowire");
+		boolean flag = false;
+		if (attribute != null){
+			flag = true;
+		}
+		for(Iterator it = elementRoot.elementIterator();it.hasNext();) {
+			/**
+			 * 实例化对象
+			 */
+			Element elementFirstChil = (Element) it.next();
+			//  <bean id="userDao" class="com.qing.dao.UserDaoImpl"/>
+			// 获取id属性
+			Attribute attributeId = elementFirstChil.attribute("id");
+			// 得到bean名称
+			String beanName = attributeId.getValue();
+			// 获取class属性
+			Attribute attributeClazz = elementFirstChil.attribute("class");
+			// 得到className
+			String className = attributeClazz.getValue();
+			Class clazz = Class.forName(className);
+
+			/**
+			 * 维护依赖关系
+			 * 看这个对象有没有依赖（判断是否有property。或者判断类是否有属性）
+			 * 如果有则注入
+			 */
+			Object object = null;
+			for (Iterator itSon = elementFirstChil.elementIterator(); itSon.hasNext(); ) {
+				Element elementSon = (Element) itSon.next();
+				if (elementSon.getName().equals("property")) {
+					// setter 方法注入
+					// <property name="userDao" ref="userDao"/>
+					object = clazz.newInstance();
+					// 获取ref属性
+					Attribute attributeRef = elementSon.attribute("ref");
+					Object objectSon = map.get(attributeRef.getValue());
+					// 获取name属性
+					Attribute attributeName = elementSon.attribute("name");
+					String name = attributeName.getValue();
+					// 获取类本身的属性成员
+					Field field = clazz.getDeclaredField(name);
+					// 利用反射set属性，要设置取消 Java 语言访问检查
+					field.setAccessible(true);
+					// set属性
+					field.set(object, objectSon);
+				} else if(elementSon.getName().equals("constructor-arg")){
+					//构造方法注入
+					// 获取ref属性
+					Attribute attributeRef = elementSon.attribute("ref");
+					Object objectSon = map.get(attributeRef.getValue());
+					// 获取objectSon所实现的接口
+					Class sonInterface = objectSon.getClass().getInterfaces()[0];
+					Constructor constructor = clazz.getConstructor(sonInterface);
+					object = constructor.newInstance(objectSon);
+				}
+			}
+			if(object == null){
+				if (flag) {// 自动装配
+					if (attribute.getValue().equals("byType")) {
+						//判斷是否有依賴
+						Field fields[] = clazz.getDeclaredFields();
+						for (Field field : fields) {
+							//得到屬性的類型，比如String aa那麽這裏的field.getType()=String.class
+							Class injectObjectClazz = field.getType();
+							/**
+							 * 由於是bytype 所以需要遍历map当中的所有对象
+							 * 判断对象的类型是不是和这个injectObjectClazz相同
+							 */
+							Object objectSon = null;
+							int count = 0;
+							for(Map.Entry<String,Object> entry : map.entrySet()){
+								Class temp = entry.getValue().getClass().getInterfaces()[0];
+								if(temp.getName().equals(injectObjectClazz.getName())){
+									objectSon = entry.getValue();
+									count ++;
+								}
+							}
+							if(count > 1){
+								throw new MySpringException("需要一个对象，但是找到了两个对象");
+							}else {
+								object = clazz.newInstance();
+								field.setAccessible(true);
+								field.set(object, objectSon);
+							}
+						}
+					}
+				}
+			}
+			if (object == null) {//沒有子标签
+				object = clazz.newInstance();
+			}
+			map.put(beanName, object);
+		}
+
+		System.out.println(map);
+	}
+
+
+	public Object getBean(String name){
+		return map.get(name);
+	}
+
+```
+
+测试类
+```java
+public class Test {
+	public static void main(String[] args) {
+
+		BeanFactory beanFactory = new BeanFactory("spring.xml");
+		UserService userService = (UserService) beanFactory.getBean("userService");
+		userService.find();
+	}
+}
+```
+
+xml
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans default-autowire="byType">
+
+<!--    setter注入-->
+    <bean id="userDao" class="com.qing.dao.UserDaoImpl"/>
+    <bean id="userService" class="com.qing.service.UserServiceImpl">
+        <property name="userDao" ref="userDao"/>
+    </bean>
+
+<!--    构造方法注入-->
+    <bean id="userDao" class="com.qing.dao.UserDaoImpl"/>
+    <bean id="userService" class="com.qing.service.UserServiceImpl">
+        <constructor-arg ref="userDao"/>
+    </bean>
+
+
+<!--    default-autowire="byType"-->
+    <bean id="userDao" class="com.qing.dao.UserDaoImpl"/>
+    <bean id="userService" class="com.qing.service.UserServiceImpl"/>
+</beans>
+```
