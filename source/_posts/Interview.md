@@ -698,6 +698,15 @@ aop的应用场景：日志记录、权限验证、效率检查、事务管理�
 * aop代理(AOP proxy)：代理对象  包含了原始对象的代码和增加后的代码的那个对象
 * 织入(Weaving)：把代理逻辑加入到目标对象上的过程
 
+### AOP实现原理？
+通过动态代理实现。动态代理又分为jdk动态代理和cglib动态代理。
+* jdk动态代理：主要通过Proxy.newProxyInstance()和InvocationHandler这两个类和方法实现
+    * 实现过程
+        * 实现InvocationHandler接口，重写invoke()方法
+        * 调用Proxy.newProxyInsatnce(classloader,interfaces,handler)方法生成代理类
+            * 生成的代理类为$Proxy0 extends Proxy implements Person
+            * 因为已经继承了Proxy,所以java动态代理只能对接口进行代理
+    * 总结： 代理类调用自己方法时，通过自身持有的中介类对象来调用中介类对象的invoke方法，从而达到代理执行被代理对象的方法。
 
 
 ## IOC
@@ -758,7 +767,6 @@ spring 中的 bean 默认是单例模式，spring 框架并没有对单例 bean 
 
 ### @Qualifier 注解有什么用？
 当您创建多个相同类型的 bean 并希望仅使用属性装配其中一个 bean 时，您可以使用@Qualifier 注解和 @Autowired 通过指定应该装配哪个确切的 bean 来消除歧义。
-
 
 
 ### 什么是事务传播行为？
