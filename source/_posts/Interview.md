@@ -263,10 +263,19 @@ length 为奇数的话，很明显 length-1 为偶数，它的最后一位是 0�
 * JDK1.8:
     采用了数组+链表+红黑树实现.**彻底放弃了Segment转而采用的是Node，其设计思想也不再是JDK1.7中的分段锁思想。**
     Java8 ConcurrentHashMap结构基本上和Java8的HashMap一样，原来是对需要进行数据操作的Segment加锁，现调整为对每个数组元素加锁（Node）。
-    
 
+### HashTable 、ConcurrentHashMap 和 hashMap 的区别？
+hashTable 默认初始容量是11，hashMap 和 ConcurrentHashMap 默认初始容量是16，
+HashTable 在put和get方法上用了 synchronized 。ConcurrentHashMap 对每个node节点使用 synchronized
 
+### LinkedHashMap 工作原理？
+LinkedHashMap基于hashMap的基础上，对每个键值对(Node节点)多维护了一个before和after指针，每次插入时维护双向链表。
+LinkedHashMap有序，可分为插入顺序和访问顺序两种。
+如果是访问顺序，那put和get操作已存在的Entry时，都会把Entry移动到双向链表的表尾(其实是先删除再插入)。
 
+### TreeMap 工作原理？
+底层红黑树实现。
+TreeMap有序是通过Comparator来进行比较的，如果comparator为null，那么就使用自然顺序
 
 
 <div style="text-align:center;color:#bfbfbf;font-size:16px;">
@@ -1747,7 +1756,7 @@ Redis集群是Redis提供的分布式数据库方案，集群通过分片（shar
 		}
 	}
 
-	public static void maxHeapDown(int[] a, int start, int end) {//调整成为最大堆
+	public static void maxHeapDown(int[] a, int start, int end) {//自顶向下调整成为最大堆
 		int son = start * 2 + 1;//左儿子
 		int root = a[start];
 
