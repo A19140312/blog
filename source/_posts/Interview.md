@@ -277,6 +277,9 @@ LinkedHashMap有序，可分为插入顺序和访问顺序两种。
 底层红黑树实现。
 TreeMap有序是通过Comparator来进行比较的，如果comparator为null，那么就使用自然顺序
 
+### Stack 的工作原理？
+继承vector，添加操作是添加到vector的尾部，pop操作是移除vector末尾元素。
+
 
 <div style="text-align:center;color:#bfbfbf;font-size:16px;">
     <span>------------------------ 异常 ------------------------</span>
@@ -433,10 +436,12 @@ Tomcat是个web容器,可能需要部署两个应用程序，不同的应用程�
 
 ### Java 中都有哪些引用类型？
 * 强引用：通常我们使用new操作符创建一个对象时所返回的引用即为强引用
-* 软引用：有用但不是必须的对象，在发生内存溢出之前会被回收。
-* 弱引用：有用但不是必须的对象，在下一次GC时会被回收。
-* 虚引用（幽灵引用/幻影引用）：无法通过虚引用获得对象，用 PhantomReference 实现虚引用，虚引用的用途是在 gc 时返回一个通知。
-
+* 软引用：有用但不是必须的对象，在发生内存溢出之前会被回收。内存不够的时候垃圾回收器会回收。softReference适用于做缓存。
+* 弱引用：有用但不是必须的对象，在下一次GC时会被回收。垃圾回收器遇到就会回收。WeekReference能解决某些地方的内存泄露问题。
+* 虚引用（幽灵引用/幻影引用）：无法通过虚引用获得对象。垃圾回收器遇到就会回收，PhantomReference<Object,queue> 实现虚引用，虚引用的用途是在 gc 时返回一个通知放到queue中。
+                         java在申请一块堆外内存之后，会在堆内存分配一个对象保存这个堆外内存的引用，这个对象被垃圾收集器管理，一旦这个对象被回收，相应的用户线程会收到通知并对直接内存进行清理工作。
+                         
+                         
 ### Java 堆的结构是什么样子的?
 ![](Interview/6.jpeg)
 堆空间一般分为新生代、老年代。
@@ -598,12 +603,17 @@ Vector、Hashtable、Stack 都是线程安全的，而像 HashMap 则是非线�
 * call方法可以抛出异常，run方法不可以。
 * 运行Callable任务可以拿到一个Future对象，表示异步计算的结果。它提供了检查计算是否完成的方法，以等待计算的完成，并检索计算的结果。通过Future对象可以了解任务执行情况，可取消任务的执行，还可获取执行结果。
 
+### FutureTask 和 Future 的区别？
+FutureTask实现了RunnableFuture接口，而RunnableFuture继承了Runnable接口和Future接口。
+所以FutureTask既可以作为Runnable被线程执行，又可以作为Future得到Callable的返回值。
+
 ### 线程有哪些状态?
 * NEW 尚未启动
-* RUNNABLE 正在执行中
+* RUNNABLE 就绪状态
+* RUNNING 执行状态
 * BLOCKED 阻塞的（被同步锁或者IO锁阻塞）
-* WAITING 永久等待状态
-* TIMED_WAITING 等待指定的时间重新被唤醒的状态
+* WAITING 等待状态
+* TIMED_WAITING 超时等待状态
 * TERMINATED 执行完成
 
 ![](Interview/01.jpeg)
@@ -614,7 +624,7 @@ Vector、Hashtable、Stack 都是线程安全的，而像 HashMap 则是非线�
 * 用法不同：sleep() 时间到会自动恢复；wait() 可以使用 notify()/notifyAll()直接唤醒。
 
 ### sleep() 和 yield() 区别？
-* sleep() 方法给其他线程运行机会时不考虑线程的优先级，因此会给低优先级的线程以运行的机会；yield() 方法只会给相同优先级或更高优先级的线程以运行的机会； 
+* sleep() 方法给其他线程运行机会时不考虑线程的优先级，因此会给低优先级的线程以运行的机会；yield() 方法**只会给相同优先级或更高优先级的线程以运行的机会；** 
 * 线程执行 sleep() 方法后转入阻塞（blocked）状态，而执行 yield() 方法后转入就绪（Runnable）状态； 
 * sleep() 方法声明抛出InterruptedException，而 yield() 方法没有声明任何异常； 
 * sleep() 方法比 yield() 方法（跟操作系统相关）具有更好的可移植性。
@@ -632,11 +642,20 @@ unpark(Thread thread) 唤醒指定线程，参数thread指定线程对象
 
 
 ### `创建线程池有哪几种方式？`
-1. public static ExecutorService newCachedThreadPool() 创建一个可缓存线程池，如果线程池长度超过处理需要，可灵活回收空闲线程，若无可回收，则新建线程，但是在之前构造的线程可用时将重用它们。
-2. public static ExecutorService newFixedThreadPool(int nThreads)  创建一个定长线程池，可控制线程最大并发数，以共享的无界队列方式来运行线程，超出的线程会在队列中等待。
-3. public static ExecutorService newSingleThreadExecutor() 创建一个单线程化的线程池，它只会用唯一的工作线程来执行任务，以无界队列方式来运行线程，保证所有任务按照指定顺序(FIFO, LIFO, 优先级)执行。
-4. public static ScheduledExecutorService newScheduledThreadPool(int corePoolSize) 创建一个周期线程池，支持定时及周期性任务执行。
-5. public static ExecutorService newWorkStealingPool() 创建持有足够线程的线程池来支持给定的并行级别，并通过使用多个队列，减少竞争，它需要穿一个并行级别的参数，如果不传，则被设定为默认的CPU数量，这个线程池实际上是ForkJoinPool的扩展，适合使用在很耗时的任务中，能够合理的使用CPU进行并行操作。
+1. public static ExecutorService newCachedThreadPool() 
+    * 默认corePoolSize = 0，maximumPoolSize= 2147483647。
+    * 创建一个可缓存线程池，如果线程池长度超过处理需要，可灵活回收空闲线程，若无可回收，则新建线程，但是在之前构造的线程可用时将重用它们。
+2. public static ExecutorService newFixedThreadPool(int nThreads) 
+    * 默认corePoolSize = nThreads，maximumPoolSize= nThreads。 
+    * 创建一个定长线程池，可控制线程最大并发数，以共享的无界队列方式来运行线程，超出的线程会在队列中等待。
+3. public static ExecutorService newSingleThreadExecutor() 
+    * 默认corePoolSize = 1，maximumPoolSize= 1。  
+    * 创建一个单线程化的线程池，它只会用唯一的工作线程来执行任务，以无界队列方式来运行线程，保证所有任务按照指定顺序(FIFO, LIFO, 优先级)执行。
+4. public static ScheduledExecutorService newScheduledThreadPool(int corePoolSize) 
+    * 默认corePoolSize = corePoolSize，maximumPoolSize= 2147483647。  
+    * 创建一个周期线程池，支持定时及周期性任务执行。
+5. public static ExecutorService newWorkStealingPool() 
+    * 创建持有足够线程的线程池来支持给定的并行级别，并通过使用多个队列，减少竞争，它需要穿一个并行级别的参数，如果不传，则被设定为默认的CPU数量，这个线程池实际上是ForkJoinPool的扩展，适合使用在很耗时的任务中，能够合理的使用CPU进行并行操作。
 
 ### 线程池流程？
 ![](Interview/threadPoll.png)
@@ -700,9 +719,9 @@ ReentrantLock 可是分为公平锁和非公平锁，默认的构造函数是非
                 * 若是当前线程，就是重入锁，将state++。
                 * 若不是当前线程，将线程放入等待队列。
                     * 如果队列为空，初始化一个thread=null的node作为队列的头head，将head.next 指向A，A.pre 指向head。
-            * 判断A是否是排队的第一个线程
-                * 如果A.pre == head ,表示A是排队的第一个线程，自旋两次尝试加锁，将A.pre 的ws值改为-1，若还失败则使用park()进行线程阻塞。
-                * 如果不是，则直接使用park()进行线程阻塞。
+                * 判断A是否是排队的第一个线程
+                    * 如果A.pre == head ,表示A是排队的第一个线程，自旋两次尝试加锁，将A.pre 的ws值改为-1，若还失败则使用park()进行线程阻塞。
+                    * 如果不是，则直接使用park()进行线程阻塞。
 
 释放锁：
 将state变量的值递减1，如果state == 0，将当前加锁线程设置成null。
@@ -742,7 +761,7 @@ ReentrantLock 可是分为公平锁和非公平锁，默认的构造函数是非
 * 如果这个方法内部调用了 wait，则可以进入其他 synchronized 方法。
 
 ### synchronized(l){XX}是锁了代码块还是对象？怎么实现？
-锁了对象l，那么是对l做了什么来表示l被锁了呢？上锁就是改变了对象头。
+锁了对象l，那么是对l做了什么来表示l被锁了呢？上锁就是改变了对象头的锁标记。
 
 ### 线程调度(优先级)
 与线程休眠类似，线程的优先级仍然无法保障线程的执行次序。只不过，优先级高的线 程获取 CPU 资源的概率较大，优先级低的并非没机会执行。
@@ -824,7 +843,12 @@ ThreadLocal 的经典使用场景是数据库连接和 session 管理等。
 * ThreadLocal本身并不存储值，它只是作为一个key来让线程从ThreadLocalMap获取value。
 
 ### ThreadLocal缺点？
-由于ThreadLocalMap的生命周期跟Thread一样长，如果没有手动删除对应key就会导致内存泄漏。
+ThreadLocal<M> t1 = new ThreadLocal<>();
+ThreadLocal 中 ThreadLocalMap 中的key和value是保存在Entry中，但是Entry实现了WeekReference，因此key是一个虚引用指向ThreadLocal对象。
+假设entry是个强引用，那么t1 = null时，ThreadLocal对象还被key强引用，导致无法回收。生命周期跟Thread一样长，只能等待线程结束。
+Entry是个弱引用，那么在t1 = null时，ThreadLocal对象 会在内存不够的时候被回收。
+但是还有一个问题，当ThreadLocal被回收时，key=null，那么value再也无法被访问到，还是存在内存溢出的问题。所以当ThreadLocal使用完成之后要调用remove方法。
+
 ThreadLocal由于真正存储数据的ThreadLocalMap只单纯地采取了数组的形式来存储数据，因此出现hash冲突时会为hash值就增加一个固定的大小0x61c88647进行线性寻找位置，会导致大量的hash冲突，造成很高的资源消耗。
 
 ### 什么是CyclicBarrier？
