@@ -1301,6 +1301,33 @@ TCP还设有一个保活计时器，显然，客户端如果出现故障，服�
 
 # 设计模式
 
+## {% post_link Design-Pattern-Singleton 单例模式 %}
+
+## {% post_link Design-Pattern-Strategy 策略模式 %}
+
+## {% post_link Design-Pattern-Proxy 代理模式 %}
+
+## {% post_link Design-Pattern-Decorator 装饰器模式 %}
+
+## {% post_link Design-Pattern-Observer 观察者模式 %}
+
+## {% post_link Design-Pattern-Flyweight 享元模式 %}
+
+## {% post_link Design-Pattern-Prototype 原型模式 %}
+
+
+## 装饰器模式与代理模式的区别？
+相同：都是增强被代理对象的功能。
+区别：是否进行功能增强、何时进行功能增强，这个决策权交给谁是不同的。
+    * 如果是别人A已经给你一个类，你需要做好增强给第三方C使用增强的类，且C不可以直接使用未增强的类对象，那么你这个开发者应该使用代理模式，把你可以获得的类对象封装到自己的代理类；
+    * 如果你希望把何时增强功能的这个决策权交给C，即C既可以使用增强的类对象，也可以使用不增强的对象，决定权在于C，那么这个时候你应该使用装饰器模式。
+应用场景上：
+    * 代理模式是为了帮助目标类增强一些自己不关心的事，比如日志代理，在目标类前后加一些日志
+    * 装饰模式则是用来增强自身的功能，比如Java的InputStream那些的子类装饰类，提供了一些更方便的接口给我们调用。
+使用方式上：
+    * 代理模式一般在代理类中确定了要被代理的目标对象，客户端根本不知道被代理类的存在。
+    * 而装饰模式中被装饰者对象需要客户端创建提供，并且可以层层嵌套，层层装饰。
+
 
 <div style="text-align:center;color:#bfbfbf;font-size:16px;">
     <span>---------------- MyBatis ----------------</span>
