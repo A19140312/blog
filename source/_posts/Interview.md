@@ -18,6 +18,13 @@ password: 12345
 </div>
 
 ## 基础
+### 字节换算
+1T = 1024 GB
+1GB = 1024 MB
+1MB = 1024 KB
+1KB = 1024 bytes
+1byte = 8bit
+
 ### JDK 和 JRE 有什么区别？
 * JDK：Java 开发工具包，提供了 Java 的开发环境和运行环境（包括JRE）。
 * JRE：Java 运行环境
@@ -252,7 +259,33 @@ HashMap 需要 一个 hash 函数，当调用 put() 方法的时候，HashMap �
 length 为偶数时，length-1 为奇数，奇数的二进制最后一位是 1，这样便保证了 hash &(length-1) 的最后一位可能为 0，也可能为 1（这取决于 h 的值），即 & 运算后的结果可能为偶数，也可能为奇数，**这样便可以保证散列的均匀性。**
 length 为奇数的话，很明显 length-1 为偶数，它的最后一位是 0，这样 hash & (length-1) 的最后一位肯定为 0，即只能为偶数，这样任何 hash 值都只会被散列到数组的偶数下标位置上，这便**浪费了近一半的空间**
 
+### 一个1000万HashMap，会占用多少空间内存？Key=Integer value=Integer
+为了方便统计，我们做如下假设：
+1. Key hash 之后的结果完全不重复（单个 bucket 最多一条记录）。
+2. loadFactor = 0.75 （默认值）。
+3. 开启指针压缩（64 bits jvm 开启指针压缩占 32 bits 不开启占 64 bits）
+
+首先对象是由对象头（12byte） + 实例数据 + 填充数据（64位虚拟机要求对象大小是8的整数倍，不够就补齐）组成
+再来看一下hashMap 中Node结构
+```java
+    static class Node<K, V> implements Entry<K, V> {
+        final int hash;// int 4byte
+        final K key; // 引用 4byte
+        V value; // 引用 4byte
+        HashMap.Node<K, V> next; // 引用 4byte
+    }
+```
+
+因此node 所占空间为：对象头12byte + 实例数据16byte + 填充数据4byte = 32byte
+key和value所占空间为：对象头12byte + 实例数据4byte + 填充数据0byte = 16byte
+
+1千万记录对应1千万个 Node 对象，占用总空间为： 10000000 * （32 + 16 + 16） = 640000000
+
+存放1千万记录，经过多次 resize 之后：table.length() = 16777216
+table 数组所占用空间为 = 16777216 * 4（数组的每一项都是一个Node引用） + 12 (对象头)+ 4(数据填充) = 67108864 + 16 = 67108880
     
+因此总空间：64000000+67108880=131108880/1024*1024= 125M
+
 ### ConcurrentHashMap 的工作原理是什么什么？
 * JDK1.7:
     ConcurrentHashMap采用了**数组+Segment+分段锁**的方式实现。
@@ -1491,6 +1524,27 @@ kafka 有两种数据保存策略：按照过期时间保留和按照存储的�
 # MySQL
 
 ## 基础
+### 基本语法
+* 创建数据库：CREATE DATABASE 数据库名;
+* 创建数据表：CREATE TABLE table_name (column_name column_type); 
+* 修改表名称：ALTER TABLE <表名> RENAME <新表名>
+* 添加表字段：ALTER TABLE <表名> ADD <字段名称> <字段定义>
+* 修改字段名称及字段定义：ALTER TABLE <表名> CHANGE <旧字段名称> <新字段名称> <字段定义>
+* 修改字段定义：ALTER TABLE <表名> MODIFY <字段名称> <字段定义>
+* 修改表的存储引擎： ALTER TABLE account ENGINE=MyISAM;
+* 删除数据表：DROP TABLE table_name ;
+* 插入数据：INSERT INTO table_name ( field1, field2,...fieldN ) VALUES ( value1, value2,...valueN );
+* 查询数据：SELECT column_name,column_name FROM table_name WHERE Clause LIMIT N OFFSET M
+* 更新数据：UPDATE table_name SET field1=new-value1, field2=new-value2 WHERE Clause
+* 排序：SELECT field1, field2,...fieldN FROM table_name1 `ORDER BY` field1 [ASC/ DESC [默认 ASC]]
+* 分组：SELECT column_name, function(column_name) FROM table_name `GROUP BY` column_name;
+* 内连接：SELECT a.runoob_id, a.runoob_author, b.runoob_count FROM runoob_tbl a `INNER JOIN `tcount_tbl b ON a.runoob_author = b.runoob_author;
+* 左连接：SELECT a.runoob_id, a.runoob_author, b.runoob_count FROM runoob_tbl a `LEFT JOIN` tcount_tbl b ON a.runoob_author = b.runoob_author;
+* 右连接：SELECT a.runoob_id, a.runoob_author, b.runoob_count FROM runoob_tbl a RIGHT JOIN tcount_tbl b ON a.runoob_author = b.runoob_author;
+* 创建索引：CREATE INDEX indexName ON mytable(username(length)); 
+* 修改表结构(添加索引)：ALTER table tableName ADD INDEX indexName(columnName)
+* 删除索引：DROP INDEX indexName ON mytable; 
+
 ### 数据库的三范式是什么？
 * 第一范式：强调的是列的原子性，即数据库表的每一列都是不可分割的原子数据项。
 * 第二范式：要求实体的属性完全依赖于主关键字。所谓完全依赖是指不能存在仅依赖主关键字一部分的属性。
